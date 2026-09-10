@@ -1,0 +1,52 @@
+{
+  "name": "launcher-cobblemon",
+  "version": "2.0.8",
+  "description": "Launcher desktop do modpack Cobblemon Legacy para Minecraft 1.21.1",
+  "author": "Cobblemon Legacy Community",
+  "desktopName": "Cobblemon Legacy Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check renderer.js && node --check drive-sync.js && node --check modrinth-sync.js && node --check fetch-retry.js && node --check minecraft-fallback.js && node --check keybinds.js && node --check server-list.js && node --check install-instance.js && node --check java-backend.js",
+    "install:instance": "node install-instance.js",
+    "dist:test": "electron-builder --linux AppImage --publish never"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "eml-lib": "^2.7.3",
+    "prismarine-nbt": "^2.8.0",
+    "yauzl": "^3.4.0"
+  },
+  "devDependencies": {
+    "electron": "^44.1.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.cobblemonlegacy.launcher",
+    "productName": "Cobblemon Legacy Launcher",
+    "artifactName": "Cobblemon-Legacy-Launcher-${version}-test.${ext}",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "drive-sync.js",
+      "modrinth-sync.js",
+      "fetch-retry.js",
+      "minecraft-fallback.js",
+      "keybinds.js",
+      "server-list.js",
+      "launcher-config.json",
+      "index.html",
+      "styles.css",
+      "package.json"
+    ],
+    "linux": {
+      "target": "AppImage",
+      "category": "Game",
+      "icon": "build/icon.png",
+      "syncDesktopName": true
+    }
+  }
+}

@@ -1,0 +1,52 @@
+name: Publicar launcher
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Instalar dependências incorporadas
+        run: npm ci --omit=dev
+
+      - name: Compilar e validar versão
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          bash java-launcher-v3/build.sh
+          test -f "dist/Cobblemon-Legacy-Launcher-${VERSION}.jar"
+          java -jar "dist/Cobblemon-Legacy-Launcher-${VERSION}.jar" --self-test
+
+      - name: Criar ou atualizar Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ASSET="dist/Cobblemon-Legacy-Launcher-${VERSION}.jar"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Cobblemon Legacy Launcher ${VERSION}" --generate-notes
+          fi
