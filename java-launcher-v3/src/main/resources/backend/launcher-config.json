@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 4,
+  "name": "Cobblemon Legacy",
+  "minecraft": {
+    "version": "1.21.1",
+    "loader": { "type": "fabric", "version": "0.19.5" }
+  },
+  "trustedSync": {
+    "remoteManifestUrl": "",
+    "trustedManifestHosts": [],
+    "allowModrinthDiscovery": true
+  },
+  "autoRepair": {
+    "enabled": true,
+    "maxAttempts": 2
+  },
+  "servers": [
+    {
+      "name": "cubblemon legacy",
+      "ip": "enx-cirion-16.enx.host:10068"
+    },
+    {
+      "name": "cubblemon legacy - alternativo 1",
+      "ip": "cobblemonlegacy.com.br:10068"
+    },
+    {
+      "name": "cubblemon legacy - alternativo 2",
+      "ip": "cobblemonlegacy.com.br"
+    }
+  ]
+}

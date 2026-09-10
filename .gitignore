@@ -14,7 +14,7 @@ drive-sync.js
 index.html
 install-instance.js
 java-backend.js
-launcher-config.json
+/launcher-config.json
 main.js
 modrinth-sync.js
 preload.js
