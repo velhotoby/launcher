@@ -35,7 +35,9 @@ final class UpdateService {
                 .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.8")
                 .GET().build();
         HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 404) return null;
+        if (response.statusCode() == 404) {
+            throw new IOException("O repositório de atualizações não está acessível publicamente.");
+        }
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new IOException("GitHub respondeu HTTP " + response.statusCode());
         }
