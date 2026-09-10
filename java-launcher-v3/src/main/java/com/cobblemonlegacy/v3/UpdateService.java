@@ -19,7 +19,7 @@ import java.util.jar.JarFile;
 
 final class UpdateService {
     private static final URI LATEST_RELEASE = URI.create(
-            "https://api.github.com/repos/41nzs4m4/Cobblemon-Legacy-Launcher/releases/latest");
+            "https://api.github.com/repos/velhotoby/launcher/releases/latest");
     private final HttpClient http = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(12))
             .followRedirects(HttpClient.Redirect.NORMAL)
