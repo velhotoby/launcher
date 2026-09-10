@@ -41,7 +41,7 @@ done
 modules=(
   eml-lib tslib yauzl yazl buffer-crc32 pend prismarine-nbt protodef lodash.reduce
   protodef-validator abort-controller event-target-shim buffer base64-js ieee754 events process
-  uri-js punycode fast-deep-equal fast-json-stable-stringify json-schema-traverse
+  uri-js punycode fast-deep-equal fast-json-stable-stringify
 )
 for module in "${modules[@]}"; do
   cp -a "$PROJECT_DIR/node_modules/$module" "$BACKEND_DIR/node_modules/$module"
