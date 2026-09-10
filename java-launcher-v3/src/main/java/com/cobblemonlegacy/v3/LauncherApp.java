@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.8";
+    private static final String CURRENT_VERSION = "3.4.9";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -105,8 +105,8 @@ public final class LauncherApp extends JFrame {
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
                 if (!UpdateService.isNewer("3.4.10", "3.4.9")
-                        || UpdateService.isNewer("3.4.8", "3.4.8")
-                        || UpdateService.isNewer("3.4.7", "3.4.8")) {
+                        || UpdateService.isNewer("3.4.9", "3.4.9")
+                        || UpdateService.isNewer("3.4.8", "3.4.9")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 try {
@@ -257,7 +257,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC CONFIÁVEL · PT-BR", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.8", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.9", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
