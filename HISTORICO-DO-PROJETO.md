@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.12`
-- Tag estável: `v3.4.12`
-- Versão local em teste: `3.4.13`
+- Versão estável publicada: `3.4.13`
+- Tag estável: `v3.4.13`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.12.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.13.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.12`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.13.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.13`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -100,7 +98,7 @@ Nome principal exibido: `cubblemon legacy`.
 - Para diagnóstico, `COBBLEMON_PERFORMANCE_PROFILE=low|balanced|high` permite substituir a seleção
   automática
 
-## Modo PC Fraco — versão 3.4.13 local
+## Modo PC Fraco — versão 3.4.13
 
 - Adiciona um checkbox discreto `PC Fraco` ao lado da orientação do nome do treinador
 - Quando selecionado, força o perfil econômico antes de preparar e iniciar o Minecraft
@@ -152,8 +150,10 @@ SHA-256 do instalador publicado:
   dist/Cobblemon-Legacy-Launcher-3.4.13.jar --backend-probe`: aprovado
 - Teste explícito do modo `PC Fraco`: perfil `low`, renderização 6 e simulação 4: aprovado
 - Manifesto do JAR 3.4.13: classe principal e `Implementation-Version: 3.4.13` confirmadas
-- SHA-256 local do JAR 3.4.13:
-  `2e1755f2a58d26e95786e46747e8f63b036e5b67804295cc627e38e67a5e3dea`
+- JAR 3.4.13 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
+  `10d6828fcb3bb13a216017aa9f6249b9ebe2140ebb0c7fb0b7f71459615fbf8c`
+- Workflow de publicação `34650435622`: aprovado
+- Retenção após a publicação: versões `3.4.13`, `3.4.12` e a permanente `3.4.11`
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.12.jar --self-test`: aprovado
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.12.jar --backend-probe`: aprovado
 - Teste dos três perfis, cálculo de RAM e aplicação preservando outras opções: aprovado
