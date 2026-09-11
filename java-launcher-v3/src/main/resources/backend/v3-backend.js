@@ -80,11 +80,12 @@ function forceBrazilianPortuguese(instanceRoot) {
 async function main() {
   const mode = String(process.argv[2] || 'offline');
   const account = loadAccount(mode, process.argv[3]);
+  const requestedPerformance = process.argv[4] === 'low' ? 'low' : '';
   emit('status', mode === 'microsoft' ? `Conta Microsoft: ${account.name}` : `Perfil local: ${account.name}`);
-  const performance = detectPerformanceProfile();
+  const performance = detectPerformanceProfile(requestedPerformance);
   emit('status', `PC detectado: ${Math.round(performance.detectedMemoryMB / 1024)} GB de RAM, ` +
     `${performance.logicalCpuCount} processadores lógicos. Perfil ${performance.label}, ` +
-    `${performance.memory.max} MB para o Minecraft.`);
+    `${performance.memory.max} MB para o Minecraft.${requestedPerformance ? ' Modo PC Fraco ativado.' : ''}`);
 
   const launcher = new AutoRepairLauncher({
     root: INSTANCE_ID,

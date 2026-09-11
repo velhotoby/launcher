@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.12";
+    private static final String CURRENT_VERSION = "3.4.13";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -52,6 +52,7 @@ public final class LauncherApp extends JFrame {
     private final JLabel accountState = label("Nenhuma conta Microsoft conectada.", MUTED, 10, Font.PLAIN);
     private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", false);
     private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", true);
+    private final JCheckBox weakPcMode = new JCheckBox("PC Fraco");
     private final StatusCard statusCard = new StatusCard();
     private final MicrosoftAuthService microsoft = new MicrosoftAuthService();
     private final BackendRuntime backendRuntime = new BackendRuntime();
@@ -106,9 +107,9 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.13", "3.4.12")
-                        || UpdateService.isNewer("3.4.12", "3.4.12")
-                        || UpdateService.isNewer("3.4.11", "3.4.12")) {
+                if (!UpdateService.isNewer("3.4.14", "3.4.13")
+                        || UpdateService.isNewer("3.4.13", "3.4.13")
+                        || UpdateService.isNewer("3.4.12", "3.4.13")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 try {
@@ -257,7 +258,17 @@ public final class LauncherApp extends JFrame {
         fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(fieldPanel);
         content.add(Box.createVerticalStrut(8));
-        content.add(label("Apenas letras, números e underscore.", MUTED, 11, Font.PLAIN));
+        JPanel profileLine = transparentPanel(new BorderLayout());
+        profileLine.add(label("Apenas letras, números e underscore.", MUTED, 11, Font.PLAIN), BorderLayout.WEST);
+        weakPcMode.setOpaque(false);
+        weakPcMode.setContentAreaFilled(false);
+        weakPcMode.setFocusPainted(false);
+        weakPcMode.setForeground(MUTED);
+        weakPcMode.setFont(font(10, Font.BOLD));
+        weakPcMode.setToolTipText("Usar os gráficos mínimos recomendados e memória ajustada ao seu PC");
+        weakPcMode.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        profileLine.add(weakPcMode, BorderLayout.EAST);
+        content.add(profileLine);
         content.add(Box.createVerticalStrut(13));
 
         playButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -275,7 +286,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.12", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.13", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -359,6 +370,7 @@ public final class LauncherApp extends JFrame {
     private void startGame() {
         if (busy) return;
         String nickname = username.getText().trim();
+        boolean weakPcSelected = weakPcMode.isSelected();
         if (authMode == AuthMode.OFFLINE && !USERNAME.matcher(nickname).matches()) {
             statusCard.update("error", "Use de 3 a 16 letras, números ou underscore.", 0);
             username.requestFocusInWindow();
@@ -382,7 +394,8 @@ public final class LauncherApp extends JFrame {
                         SwingUtilities.invokeLater(() -> statusCard.update("working", message, 5)));
                 String mode = authMode == AuthMode.MICROSOFT ? "microsoft" : "offline";
                 String identity = authMode == AuthMode.MICROSOFT ? microsoft.sessionFile().toString() : nickname;
-                ProcessBuilder builder = new ProcessBuilder(prepared.node().toString(), prepared.backend().toString(), mode, identity);
+                ProcessBuilder builder = new ProcessBuilder(prepared.node().toString(), prepared.backend().toString(),
+                        mode, identity, weakPcSelected ? "low" : "auto");
                 builder.directory(prepared.backend().getParent().toFile());
                 builder.redirectErrorStream(true);
                 backendProcess = builder.start();
@@ -721,6 +734,7 @@ public final class LauncherApp extends JFrame {
         username.setEnabled(!value && authMode == AuthMode.OFFLINE);
         offlineMode.setEnabled(!value);
         microsoftMode.setEnabled(!value);
+        weakPcMode.setEnabled(!value);
         playButton.setEnabled(!value);
         uninstallButton.setEnabled(!value);
         playButton.setText(value ? "AGUARDE..." : "INICIAR AVENTURA");

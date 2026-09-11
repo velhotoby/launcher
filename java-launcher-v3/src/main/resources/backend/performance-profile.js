@@ -91,11 +91,11 @@ function selectPerformanceProfile(totalMemoryMB, logicalCpuCount, override = '')
   };
 }
 
-function detectPerformanceProfile() {
+function detectPerformanceProfile(override = process.env.COBBLEMON_PERFORMANCE_PROFILE) {
   return selectPerformanceProfile(
     Math.floor(os.totalmem() / MIB),
     Math.max(1, os.cpus()?.length || os.availableParallelism?.() || 1),
-    process.env.COBBLEMON_PERFORMANCE_PROFILE
+    override
   );
 }
 

@@ -6,7 +6,7 @@ const { downloadMod, validateCatalog } = require('./trusted-mod-sync');
 
 const MODRINTH_API = 'https://api.modrinth.com/v2';
 const DISCOVERED_FILENAME = '.launcher-discovered-mods-v1.json';
-const USER_AGENT = 'CobblemonLegacyLauncher/3.4.12';
+const USER_AGENT = 'CobblemonLegacyLauncher/3.4.13';
 
 async function apiJson(url) {
   const parsed = new URL(url);
