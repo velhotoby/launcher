@@ -27,7 +27,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 final class MicrosoftAuthService {
-    private final HttpClient http = MinecraftAuth.createHttpClient("Cobblemon-Legacy-Launcher/3.4.9");
+    private final HttpClient http = MinecraftAuth.createHttpClient("Cobblemon-Legacy-Launcher/3.4.10");
     private final Path authDirectory = Path.of(System.getProperty("user.home"), ".cobblemon_legacy_launcher");
     private final Path stateFile = authDirectory.resolve("microsoft-auth-state.json");
     private final Path accountFile = authDirectory.resolve("microsoft-account.json");

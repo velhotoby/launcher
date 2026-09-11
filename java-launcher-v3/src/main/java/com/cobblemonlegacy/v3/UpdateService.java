@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.IntConsumer;
 import java.util.jar.JarFile;
 
@@ -32,7 +33,7 @@ final class UpdateService {
                 .timeout(Duration.ofSeconds(20))
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
-                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.9")
+                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.10")
                 .GET().build();
         HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 404) {
@@ -80,7 +81,7 @@ final class UpdateService {
             HttpRequest request = HttpRequest.newBuilder(release.downloadUrl())
                     .timeout(Duration.ofMinutes(5))
                     .header("Accept", "application/octet-stream")
-                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.9")
+                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.10")
                     .GET().build();
             HttpResponse<InputStream> response = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
@@ -104,6 +105,7 @@ final class UpdateService {
             } catch (AtomicMoveNotSupportedException ignored) {
                 Files.move(temporary, destination, StandardCopyOption.REPLACE_EXISTING);
             }
+            destination.toFile().setReadable(true, false);
             progress.accept(100);
             return destination;
         } finally {
@@ -112,12 +114,53 @@ final class UpdateService {
     }
 
     void launch(Path jar) throws IOException {
+        Path target = jar.toAbsolutePath().normalize();
+        if (!Files.isRegularFile(target)) throw new IOException("A nova versão não foi encontrada.");
+
         Path javaHome = Path.of(System.getProperty("java.home"));
         boolean windows = System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
-        Path java = javaHome.resolve("bin").resolve(windows ? "java.exe" : "java");
+        Path javaw = javaHome.resolve("bin").resolve("javaw.exe");
+        Path java = windows && Files.isRegularFile(javaw)
+                ? javaw : javaHome.resolve("bin").resolve(windows ? "java.exe" : "java");
         if (!Files.isRegularFile(java)) throw new IOException("Java não encontrado para reiniciar o launcher.");
-        new ProcessBuilder(java.toString(), "-jar", jar.toString())
-                .directory(jar.getParent().toFile()).start();
+
+        var command = new java.util.ArrayList<String>();
+        if (!windows) {
+            Path setsid = executable("/usr/bin/setsid", "/bin/setsid");
+            Path nohup = executable("/usr/bin/nohup", "/bin/nohup");
+            if (setsid != null) command.add(setsid.toString());
+            else if (nohup != null) command.add(nohup.toString());
+        }
+        command.add(java.toString());
+        command.add("-jar");
+        command.add(target.toString());
+
+        Path previous = runningJar();
+        if (previous != null && !previous.equals(target)) {
+            command.add("--updated-from");
+            command.add(previous.toString());
+        }
+
+        Process process = new ProcessBuilder(command)
+                .directory(target.getParent().toFile())
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                .redirectError(ProcessBuilder.Redirect.DISCARD)
+                .start();
+        try {
+            if (process.waitFor(1200, TimeUnit.MILLISECONDS)) {
+                throw new IOException("A nova versão encerrou imediatamente (código "
+                        + process.exitValue() + ").");
+            }
+        } catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+            throw new IOException("O reinício do launcher foi interrompido.", error);
+        }
+    }
+
+    static void deletePreviousWhenPossible(Path previousJar) {
+        Thread cleanup = new Thread(() -> deletePrevious(previousJar), "launcher-update-cleanup");
+        cleanup.setDaemon(true);
+        cleanup.start();
     }
 
     static boolean isNewer(String candidate, String current) {
@@ -158,11 +201,69 @@ final class UpdateService {
         }
     }
 
-    private static Path updateDirectory() {
+    private static void deletePrevious(Path previousJar) {
+        Path previous = previousJar.toAbsolutePath().normalize();
+        Path current = runningJar();
+        if (!isSafePreviousJar(previous, current)) return;
+
+        for (int attempt = 0; attempt < 60; attempt++) {
+            try {
+                if (Files.deleteIfExists(previous)) return;
+            } catch (IOException ignored) {
+                // No Windows o processo anterior pode manter o JAR bloqueado por alguns segundos.
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        if (Files.exists(previous)) previous.toFile().deleteOnExit();
+    }
+
+    private static boolean isSafePreviousJar(Path previous, Path current) {
         try {
-            Path source = Path.of(UpdateService.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (Files.isRegularFile(source) && Files.isWritable(source.getParent())) return source.getParent();
-        } catch (Exception ignored) {}
+            if (current == null || !Files.isRegularFile(previous) || Files.isSameFile(previous, current)) return false;
+            if (!previous.getFileName().toString()
+                    .matches("(?i)Cobblemon-Legacy-Launcher-[0-9][0-9.]*\\.jar")) return false;
+            String previousVersion = packagedVersion(previous);
+            String currentVersion = packagedVersion(current);
+            return !previousVersion.isBlank() && isNewer(currentVersion, previousVersion);
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
+    private static String packagedVersion(Path path) throws IOException {
+        try (JarFile jar = new JarFile(path.toFile())) {
+            if (jar.getEntry("com/cobblemonlegacy/v3/LauncherApp.class") == null
+                    || jar.getManifest() == null) return "";
+            return cleanVersion(jar.getManifest().getMainAttributes().getValue("Implementation-Version"));
+        }
+    }
+
+    private static Path runningJar() {
+        try {
+            Path source = Path.of(UpdateService.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+                    .toAbsolutePath().normalize();
+            return Files.isRegularFile(source) ? source : null;
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static Path executable(String... candidates) {
+        for (String candidate : candidates) {
+            Path path = Path.of(candidate);
+            if (Files.isExecutable(path)) return path;
+        }
+        return null;
+    }
+
+    private static Path updateDirectory() {
+        Path source = runningJar();
+        if (source != null && Files.isWritable(source.getParent())) return source.getParent();
         return Path.of(System.getProperty("user.home"), ".cobblemon_legacy_launcher", "updates")
                 .toAbsolutePath().normalize();
     }
