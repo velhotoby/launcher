@@ -50,3 +50,17 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Cobblemon Legacy Launcher ${VERSION}" --generate-notes
           fi
+
+      - name: Manter somente as duas versões mais recentes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mapfile -t OLD_RELEASES < <(
+            gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
+              --json tagName,publishedAt \
+              --jq 'sort_by(.publishedAt) | reverse | .[2:] | .[].tagName'
+          )
+          for TAG in "${OLD_RELEASES[@]}"; do
+            gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes
+          done
