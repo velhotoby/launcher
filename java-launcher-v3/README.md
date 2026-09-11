@@ -1,8 +1,8 @@
-# Cobblemon Legacy Launcher 3.4.10
+# Cobblemon Legacy Launcher 3.4.11
 
 Versão Java multiplataforma do launcher da comunidade.
 
-O visual 3.4.10 reproduz a identidade do site oficial: banner da comunidade, tipografia
+O visual 3.4.11 reproduz a identidade do site oficial: banner da comunidade, tipografia
 Chakra Petch/Inter, cartões creme com contornos escuros e a paleta vermelho, azul e verde.
 As funções e configurações da versão 3.4.6 foram preservadas.
 
@@ -31,11 +31,11 @@ A versão baixada abre em um processo independente no Linux e no Windows. Depois
 janela inicia, ela valida e exclui somente o JAR anterior do Cobblemon Legacy Launcher; arquivos
 que não correspondam a uma versão válida e mais antiga nunca entram nessa limpeza.
 
-Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.10.jar`.
+Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.11.jar`.
 
 ## Sincronização de mods
 
-A versão 3.4.10 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
+A versão 3.4.11 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
 baixados apenas de hosts HTTPS aprovados (Modrinth CDN, CurseForge CDN e Maven oficial da FTB),
 sempre com validação de tamanho e SHA-512.
 

@@ -33,7 +33,7 @@ final class UpdateService {
                 .timeout(Duration.ofSeconds(20))
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
-                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.10")
+                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.11")
                 .GET().build();
         HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 404) {
@@ -81,7 +81,7 @@ final class UpdateService {
             HttpRequest request = HttpRequest.newBuilder(release.downloadUrl())
                     .timeout(Duration.ofMinutes(5))
                     .header("Accept", "application/octet-stream")
-                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.10")
+                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.11")
                     .GET().build();
             HttpResponse<InputStream> response = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
@@ -114,6 +114,10 @@ final class UpdateService {
     }
 
     void launch(Path jar) throws IOException {
+        launch(jar, new String[0]);
+    }
+
+    private void launch(Path jar, String... startupArguments) throws IOException {
         Path target = jar.toAbsolutePath().normalize();
         if (!Files.isRegularFile(target)) throw new IOException("A nova versão não foi encontrada.");
 
@@ -134,9 +138,10 @@ final class UpdateService {
         command.add(java.toString());
         command.add("-jar");
         command.add(target.toString());
+        command.addAll(List.of(startupArguments));
 
         Path previous = runningJar();
-        if (previous != null && !previous.equals(target)) {
+        if (previous != null && !previous.equals(target) && !hasUpdatedFrom(startupArguments)) {
             command.add("--updated-from");
             command.add(previous.toString());
         }
@@ -154,6 +159,22 @@ final class UpdateService {
         } catch (InterruptedException error) {
             Thread.currentThread().interrupt();
             throw new IOException("O reinício do launcher foi interrompido.", error);
+        }
+    }
+
+    static boolean detachCurrent() {
+        Path current = runningJar();
+        if (current == null) return false;
+        try {
+            Path previous = newestPreviousBeside(current);
+            if (previous == null) {
+                new UpdateService().launch(current, "--launcher-detached");
+            } else {
+                new UpdateService().launch(current, "--launcher-detached", "--updated-from", previous.toString());
+            }
+            return true;
+        } catch (IOException ignored) {
+            return false;
         }
     }
 
@@ -235,6 +256,26 @@ final class UpdateService {
         }
     }
 
+    private static Path newestPreviousBeside(Path current) {
+        Path selected = null;
+        String selectedVersion = "";
+        try (var candidates = Files.newDirectoryStream(current.getParent(),
+                "Cobblemon-Legacy-Launcher-*.jar")) {
+            for (Path candidate : candidates) {
+                Path normalized = candidate.toAbsolutePath().normalize();
+                if (!isSafePreviousJar(normalized, current)) continue;
+                String version = packagedVersion(normalized);
+                if (selected == null || isNewer(version, selectedVersion)) {
+                    selected = normalized;
+                    selectedVersion = version;
+                }
+            }
+        } catch (IOException ignored) {
+            return null;
+        }
+        return selected;
+    }
+
     private static String packagedVersion(Path path) throws IOException {
         try (JarFile jar = new JarFile(path.toFile())) {
             if (jar.getEntry("com/cobblemonlegacy/v3/LauncherApp.class") == null
@@ -259,6 +300,13 @@ final class UpdateService {
             if (Files.isExecutable(path)) return path;
         }
         return null;
+    }
+
+    private static boolean hasUpdatedFrom(String[] arguments) {
+        for (String argument : arguments) {
+            if ("--updated-from".equals(argument)) return true;
+        }
+        return false;
     }
 
     private static Path updateDirectory() {

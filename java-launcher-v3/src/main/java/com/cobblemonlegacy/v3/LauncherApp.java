@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.10";
+    private static final String CURRENT_VERSION = "3.4.11";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -104,9 +104,9 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.11", "3.4.10")
-                        || UpdateService.isNewer("3.4.10", "3.4.10")
-                        || UpdateService.isNewer("3.4.9", "3.4.10")) {
+                if (!UpdateService.isNewer("3.4.12", "3.4.11")
+                        || UpdateService.isNewer("3.4.11", "3.4.11")
+                        || UpdateService.isNewer("3.4.10", "3.4.11")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 try {
@@ -124,12 +124,16 @@ public final class LauncherApp extends JFrame {
                 System.exit(1);
             }
         }
+        if (args.length == 0 && UpdateService.detachCurrent()) return;
+
         Path previousJar = null;
-        if (args.length == 2 && "--updated-from".equals(args[0])) {
-            try {
-                previousJar = Path.of(args[1]).toAbsolutePath().normalize();
-            } catch (RuntimeException ignored) {
-                // Um argumento inválido nunca deve impedir o launcher de abrir.
+        for (int i = 0; i + 1 < args.length; i++) {
+            if ("--updated-from".equals(args[i])) {
+                try {
+                    previousJar = Path.of(args[++i]).toAbsolutePath().normalize();
+                } catch (RuntimeException ignored) {
+                    // Um argumento inválido nunca deve impedir o launcher de abrir.
+                }
             }
         }
         System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -269,7 +273,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC CONFIÁVEL · PT-BR", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.10", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.11", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
