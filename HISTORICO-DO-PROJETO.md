@@ -10,11 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.11`
-- Tag estável: `v3.4.11`
+- Versão estável publicada: `3.4.12`
+- Tag estável: `v3.4.12`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.11.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.11`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.12.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.12`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -81,6 +81,23 @@ Nome principal exibido: `cubblemon legacy`.
 - Painéis creme, contornos escuros e paleta vermelho, azul e verde
 - Recursos visuais ficam em `java-launcher-v3/src/main/resources/ui`
 
+## Desempenho automático — versão 3.4.12
+
+- Detecta memória física e quantidade de processadores lógicos antes de iniciar o Minecraft
+- Seleciona automaticamente um perfil `low`, `balanced` ou `high`
+- Ajusta a memória máxima do Minecraft entre 2 GB e 6 GB conforme a RAM disponível
+- Usa G1GC com processamento paralelo de referências, deduplicação de strings e pausa-alvo de 100 ms
+- Configura distância de renderização e simulação, entidades, partículas, modo gráfico, mistura de
+  biomas, mipmaps, limite de FPS, VSync, sombras e iluminação ambiente
+- Em PCs com menos de 7 GB de RAM ou até 4 processadores lógicos usa o perfil econômico
+- Em PCs intermediários usa o perfil equilibrado; computadores com ao menos 14 GB e mais de 8
+  processadores lógicos usam o perfil de alto desempenho
+- Preserva opções não gerenciadas e todos os atalhos do usuário
+- Registra o perfil em `.launcher-performance-v1.json` e só reaplica quando o perfil muda ou o
+  `options.txt` precisa ser recriado
+- Para diagnóstico, `COBBLEMON_PERFORMANCE_PROFILE=low|balanced|high` permite substituir a seleção
+  automática
+
 ## Atualizador do launcher
 
 - Consulta `https://api.github.com/repos/velhotoby/launcher/releases/latest`
@@ -116,8 +133,11 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
-- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.11.jar --self-test`: aprovado
-- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.11.jar --backend-probe`: aprovado
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.12.jar --self-test`: aprovado
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.12.jar --backend-probe`: aprovado
+- Teste dos três perfis, cálculo de RAM e aplicação preservando outras opções: aprovado
+- Perfil detectado na máquina de desenvolvimento: alto desempenho, 15,5 GB de RAM, 16 processadores
+  lógicos, 5.632 MB para o Minecraft, renderização 12 e simulação 8
 - Migração simulada `3.4.10` → `3.4.11`: nova JVM permaneceu aberta e JAR anterior foi removido
 - Instalador executado em perfil Wine isolado: aprovado
 - JAR baixado pelo instalador: versão `3.4.11`, SHA-256

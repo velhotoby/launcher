@@ -9,6 +9,7 @@ const { ensureServer } = require('./server-list');
 const { installReliableFetch } = require('./fetch-retry');
 const { ensureBundledMinecraftFiles } = require('./minecraft-fallback');
 const { applyDefaultKeybinds } = require('./keybinds');
+const { applyPerformanceProfile, detectPerformanceProfile } = require('./performance-profile');
 
 const INSTANCE_ID = 'cobblemon-legacy';
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
@@ -17,6 +18,7 @@ const IGNORED_PATHS = [
   'shaderpacks/', 'options.txt', 'optionsof.txt', 'mods/', 'servers.dat',
   '.launcher-drive-sync-v2.json', '.launcher-modrinth-sync-v1.json', '.launcher-cache-v2/',
   '.launcher-keybinds-v1.json', '.launcher-trusted-sync-v1.json',
+  '.launcher-performance-v1.json',
   '.launcher-discovered-mods-v1.json', '.launcher-mods-quarantine-v1/',
   '.launcher-mods-staging-v1/', '.launcher-mod-discovery-v1/'
 ];
@@ -79,6 +81,10 @@ async function main() {
   const mode = String(process.argv[2] || 'offline');
   const account = loadAccount(mode, process.argv[3]);
   emit('status', mode === 'microsoft' ? `Conta Microsoft: ${account.name}` : `Perfil local: ${account.name}`);
+  const performance = detectPerformanceProfile();
+  emit('status', `PC detectado: ${Math.round(performance.detectedMemoryMB / 1024)} GB de RAM, ` +
+    `${performance.logicalCpuCount} processadores lógicos. Perfil ${performance.label}, ` +
+    `${performance.memory.max} MB para o Minecraft.`);
 
   const launcher = new AutoRepairLauncher({
     root: INSTANCE_ID,
@@ -88,7 +94,8 @@ async function main() {
       loader: { loader: config.minecraft.loader.type, version: config.minecraft.loader.version }
     },
     cleaning: { ignored: IGNORED_PATHS },
-    memory: { min: 1024, max: 4096 }
+    java: { args: performance.javaArgs },
+    memory: performance.memory
   }, () => emit('status', 'Diferença de mods detectada. Fechando o jogo para reparar...'));
 
   launcher.on('launch_compute_download', () => emit('status', 'Calculando arquivos do Minecraft...'));
@@ -122,6 +129,10 @@ async function main() {
   if (keybinds.changed) emit('status', `${keybinds.count} atalhos padrão configurados.`);
   forceBrazilianPortuguese(launcher.config.root);
   emit('status', 'Idioma definido como Português (Brasil).');
+  const performanceResult = await applyPerformanceProfile(launcher.config.root, performance);
+  emit('status', performanceResult.changed
+    ? `Minecraft otimizado para o perfil ${performance.label}: ${performanceResult.count} ajustes aplicados.`
+    : `Perfil de desempenho ${performance.label} já está configurado.`);
 
   const maximumRepairs = config.autoRepair?.enabled === false ? 0 : Math.max(1, Number(config.autoRepair?.maxAttempts) || 1);
   try {

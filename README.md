@@ -19,6 +19,7 @@ O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado au
 - idioma Português (Brasil) e atalhos padronizados
 - três endereços do servidor configurados automaticamente
 - atualização do próprio launcher pela publicação mais recente do GitHub
+- perfil automático de RAM, processador e opções gráficas para reduzir lag em PCs modestos
 - suporte a Linux e Windows por um único arquivo JAR
 
 ## Atualizações
