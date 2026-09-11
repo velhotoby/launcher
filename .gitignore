@@ -8,7 +8,10 @@ java-launcher-v3/build/
 
 # Projetos e protótipos antigos mantidos apenas na máquina de desenvolvimento
 android-launcher/
-windows-installer/
+windows-installer/downloads/
+windows-installer/dist/
+windows-installer/payload/
+windows-installer/tools/
 java-launcher/
 drive-sync.js
 index.html

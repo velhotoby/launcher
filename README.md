@@ -4,8 +4,12 @@ Launcher oficial multiplataforma da comunidade Cobblemon Legacy.
 
 ## Download
 
-Baixe o JAR mais recente na página de [Releases](../../releases/latest). O launcher exige
-Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado automaticamente.
+No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.11/Cobblemon-Legacy-Launcher-Installer.exe):
+ele baixa e valida automaticamente o JAR estável mais recente, instala o Java 21 e cria
+atalhos na Área de Trabalho, menu Iniciar e barra de tarefas.
+
+Também é possível baixar o JAR mais recente na página de [Releases](../../releases/latest).
+O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado automaticamente.
 
 ## Recursos
 

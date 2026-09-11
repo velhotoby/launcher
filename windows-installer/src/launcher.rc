@@ -1,0 +1,30 @@
+1 ICON "../assets/cobblemon-legacy.ico"
+
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "CompanyName", "Comunidade Cobblemon Legacy\0"
+      VALUE "FileDescription", "Cobblemon Legacy Launcher\0"
+      VALUE "FileVersion", "1.0.0.0\0"
+      VALUE "InternalName", "CobblemonLegacyLauncher\0"
+      VALUE "LegalCopyright", "Comunidade Cobblemon Legacy\0"
+      VALUE "OriginalFilename", "CobblemonLegacyLauncher.exe\0"
+      VALUE "ProductName", "Cobblemon Legacy Launcher\0"
+      VALUE "ProductVersion", "Online 1.0\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 1200
+  END
+END
