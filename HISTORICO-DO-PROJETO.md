@@ -16,12 +16,15 @@ mudança relevante for concluída, testada ou publicada.
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.11.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.11`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
-- Política de retenção pública: manter no GitHub somente as duas releases/tags mais recentes;
-  a limpeza está automatizada em `.github/workflows/release.yml`
+- Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
+  site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
+  limpeza estão automatizadas em `.github/workflows/release.yml`
 
 Em 11 de setembro de 2026, as releases e tags `v3.4.8` e `v3.4.9` foram removidas do GitHub.
-Permaneceram publicadas somente `v3.4.10` e `v3.4.11`. Ao publicar uma terceira versão no futuro,
-o workflow exclui automaticamente a release e a tag mais antigas depois da nova publicação.
+Permaneceram publicadas somente `v3.4.10` e `v3.4.11`. A `v3.4.11` e os assets
+`Cobblemon-Legacy-Launcher-3.4.11.jar` e `Cobblemon-Legacy-Launcher-Installer.exe` nunca entram
+na limpeza. Ao publicar novas versões, o workflow preserva esses links e exclui automaticamente
+as releases rotativas que ultrapassarem o limite de duas.
 
 ## Configuração do jogo
 
