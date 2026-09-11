@@ -138,6 +138,10 @@ SHA-256 do instalador publicado:
 - Teste dos três perfis, cálculo de RAM e aplicação preservando outras opções: aprovado
 - Perfil detectado na máquina de desenvolvimento: alto desempenho, 15,5 GB de RAM, 16 processadores
   lógicos, 5.632 MB para o Minecraft, renderização 12 e simulação 8
+- JAR 3.4.12 publicado e baixado novamente para validação: SHA-256
+  `625f5161ab93d90f3810ad60cd6acd7adce90aa1e551e75fd3d5ad71dc0677d0`
+- Instalador permanente da `v3.4.11` testado após a publicação: detectou, validou e instalou
+  automaticamente o JAR `3.4.12`
 - Migração simulada `3.4.10` → `3.4.11`: nova JVM permaneceu aberta e JAR anterior foi removido
 - Instalador executado em perfil Wine isolado: aprovado
 - JAR baixado pelo instalador: versão `3.4.11`, SHA-256
