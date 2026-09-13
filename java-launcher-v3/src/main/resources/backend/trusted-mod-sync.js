@@ -23,7 +23,8 @@ const TRUSTED_MANIFEST_HOSTS = new Set([
 ]);
 
 function validateFilename(filename) {
-  return typeof filename === 'string' && filename.endsWith('.jar') && path.basename(filename) === filename;
+  return typeof filename === 'string' && filename.endsWith('.jar')
+    && path.posix.basename(filename) === filename && path.win32.basename(filename) === filename;
 }
 
 function validateCatalog(catalog) {
@@ -82,7 +83,7 @@ async function downloadMod(mod, destination, onProgress) {
     try {
       assertTrustedDownload(rawUrl, mod.filename);
       const response = await fetch(rawUrl, {
-        redirect: 'follow', headers: { 'User-Agent': 'CobblemonLegacyLauncher/3.4.14' }
+        redirect: 'follow', headers: { 'User-Agent': 'CobblemonLegacyLauncher/3.4.15' }
       });
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
       assertTrustedDownload(response.url, mod.filename);
@@ -125,7 +126,7 @@ async function loadCatalog(configuration, notify, gamePath) {
   }
   notify({ type: 'status', message: 'Procurando atualizações do modpack no servidor...' });
   const response = await fetch(remoteUrl, { headers: {
-    'User-Agent': 'CobblemonLegacyLauncher/3.4.14',
+    'User-Agent': 'CobblemonLegacyLauncher/3.4.15',
     'Cache-Control': 'no-cache'
   } });
   if (!response.ok) throw new Error(`O manifesto remoto respondeu HTTP ${response.status}.`);
@@ -227,4 +228,4 @@ async function syncTrustedMods(gamePath, configuration = {}, notify = () => {}) 
   }
 }
 
-module.exports = { syncTrustedMods, validateCatalog, downloadMod, loadCatalog };
+module.exports = { syncTrustedMods, validateCatalog, validateFilename, downloadMod, loadCatalog };

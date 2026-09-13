@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 12 de setembro de 2026.
+Última atualização deste documento: 13 de setembro de 2026.
 
 ## Estado atual
 
@@ -12,8 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.14`
 - Tag estável: `v3.4.14`
+- Versão local em teste: `3.4.15`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.14.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.14`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -77,6 +79,26 @@ Nome principal exibido: `cubblemon legacy`.
 - Durante o jogo, o launcher acompanha incompatibilidades de mods; quando encontra um namespace
   ausente com correspondência exata e confiável, baixa o mod e reinicia o Minecraft
 - A identificação automática exige confirmação do ID dentro de `fabric.mod.json`
+
+## Diagnóstico de entrada no servidor — versão 3.4.15 local
+
+- O modpack básico continua sendo sincronizado antes do jogo; a descoberta de mods **novos**
+  ocorre somente após erro de mod ao entrar em um dos três servidores configurados
+- A tentativa é delimitada pela linha `Connecting to ...`; erros de outros servidores,
+  desconexões de rede e desconexões após entrar no mundo não iniciam download
+- Um relatório de cada falha detectada é salvo em
+  `~/.cobblemon_legacy/logs/launcher-connection-errors/` no Linux ou no equivalente da instância
+  em `%USERPROFILE%` no Windows; tokens conhecidos são ocultados e o arquivo é privado no Linux
+- O relatório inclui o trecho do log, servidor, namespaces e nome/versão exigidos quando o erro
+  os informa; depois registra o nome e a versão encontrados no Modrinth ou o motivo da falha
+- Versões exatas exigidas pelo erro não são substituídas por versões mais recentes; exigências
+  mínimas numéricas são comparadas antes do download
+- O JAR candidato precisa ter o ID exato no `fabric.mod.json` e passar por verificação de
+  hostname HTTPS aprovado, tamanho e SHA-512 antes da sincronização e do reinício automático
+- Quando o erro não informa a versão, a versão registrada é a candidata compatível encontrada
+  no Modrinth, não uma versão confirmada pelo servidor; sem ID verificável, não há download
+- Mods já presentes com versão incompatível e mods ausentes das fontes consultáveis exigem
+  atualização do manifesto confiável; a versão não é adivinhada
 
 ## Visual atual
 
@@ -150,6 +172,18 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- `node java-launcher-v3/src/main/resources/backend/server-error-diagnostics.js --self-test`: aprovado
+- `node java-launcher-v3/tools/test-server-repair.js`: aprovado para outro servidor, falha de
+  rede, desconexão após entrada, mod ausente e namespaces de registro
+- `node java-launcher-v3/tools/test-mod-discovery.js`: aprovado com API simulada, exigência de
+  versão exata, confirmação de `fabric.mod.json` e SHA-512
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.15.jar --self-test`: aprovado
+- `--backend-probe` do JAR `3.4.15` com perfil temporário isolado: aprovado
+- Manifesto do JAR `3.4.15`: `Implementation-Version: 3.4.15` confirmado
+- SHA-256 local do JAR `3.4.15`:
+  `c7f54b312ffba616d00bdc2116ee103826c7518e3b6fa91ac1a090ceef2d05f3`
+- Não foi realizado teste de falha real contra o servidor; a validação de reparo usou logs e API
+  simulados sem alterar a instância real do Minecraft
 - JAR 3.4.14 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
   `8d241db74f25dab98dad50a21af732548267f8234531f023491bd1edfe0c7bac`
 - Workflow de publicação `34729639580`: aprovado

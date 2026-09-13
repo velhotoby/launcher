@@ -1,8 +1,8 @@
-# Cobblemon Legacy Launcher 3.4.14
+# Cobblemon Legacy Launcher 3.4.15
 
 Versão Java multiplataforma do launcher da comunidade.
 
-O visual 3.4.14 reproduz a identidade do site oficial: banner da comunidade, tipografia
+O visual 3.4.15 reproduz a identidade do site oficial: banner da comunidade, tipografia
 Chakra Petch/Inter, cartões creme com contornos escuros e a paleta vermelho, azul e verde.
 As funções e configurações da versão 3.4.6 foram preservadas.
 
@@ -31,7 +31,7 @@ e `sensible-browser`, além de um botão para repetir a abertura ou copiar o end
 
 ## Desempenho automático
 
-A versão 3.4.14 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
+A versão 3.4.15 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
 o Minecraft. Com esses dados, seleciona um perfil econômico, equilibrado ou de alto desempenho e
 define uma quantidade segura de RAM para a JVM (de 2 a 6 GB, conforme o computador).
 
@@ -51,11 +51,11 @@ A versão baixada abre em um processo independente no Linux e no Windows. Depois
 janela inicia, ela valida e exclui somente o JAR anterior do Cobblemon Legacy Launcher; arquivos
 que não correspondam a uma versão válida e mais antiga nunca entram nessa limpeza.
 
-Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.14.jar`.
+Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.15.jar`.
 
 ## Sincronização de mods
 
-A versão 3.4.14 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
+A versão 3.4.15 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
 baixados apenas de hosts HTTPS aprovados (Modrinth CDN, CurseForge CDN e Maven oficial da FTB),
 sempre com validação de tamanho e SHA-512.
 
@@ -64,12 +64,18 @@ preencha `trustedSync.remoteManifestUrl`. Também é possível definir `COBBLEMO
 ambiente. O catálogo remoto é consultado a cada inicialização e pode adicionar, atualizar ou remover
 mods; arquivos excedentes são movidos para uma pasta de quarentena recuperável.
 
-Durante o jogo, o launcher acompanha a saída do Minecraft. Ao detectar incompatibilidade
-do conjunto de mods durante uma conexão, ele fecha o Minecraft, consulta novamente o
-manifesto e tenta identificar os namespaces ausentes no Modrinth. Um resultado automático
-só é aceito quando o `fabric.mod.json` do JAR confirma exatamente o ID procurado; tamanho,
-SHA-512 e host do download também são validados. Após aplicar os arquivos, o Minecraft é
-reiniciado. Se não houver correspondência exata e confiável, o reinício é interrompido para
-impedir downloads por aproximação.
+O modpack básico continua sendo verificado antes de abrir o jogo. A **descoberta de mods novos**
+só começa depois de uma falha ao entrar em um dos três servidores configurados. O launcher salva
+o trecho do log em `logs/launcher-connection-errors` dentro da instância, registra o nome e a
+versão exigidos quando o erro os informa e procura no Modrinth uma versão Fabric 1.21.1 que
+atenda à exigência. Antes de aceitar o resultado, ele confere o ID exato no `fabric.mod.json`,
+o tamanho, o SHA-512 e o host HTTPS do download. Quando instala um novo mod, registra o nome e
+a versão encontrados no mesmo log e reinicia o Minecraft automaticamente.
+
+Erros de rede, erros de outros servidores e falhas sem ID de mod verificável apenas geram um
+diagnóstico: não provocam download. Quando o servidor informa só um namespace, a versão
+registrada é a da opção compatível encontrada no Modrinth, **não** uma versão confirmada pelo
+servidor. Se o mod já estiver no catálogo com uma versão diferente, o manifesto do modpack
+precisa ser atualizado; o launcher não substitui esse arquivo por aproximação.
 
 O launcher requer Java 17 ou superior para abrir. O Minecraft 1.21.1 usa o Java 21 gerenciado pelo núcleo.

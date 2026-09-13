@@ -29,6 +29,7 @@ rm -f "$CLASSES_DIR"/META-INF/*.SF "$CLASSES_DIR"/META-INF/*.RSA "$CLASSES_DIR"/
 
 cp "$V3_DIR/src/main/resources/backend/v3-backend.js" "$BACKEND_DIR/"
 cp "$V3_DIR/src/main/resources/backend/auto-repair-launcher.js" "$BACKEND_DIR/"
+cp "$V3_DIR/src/main/resources/backend/server-error-diagnostics.js" "$BACKEND_DIR/"
 cp "$V3_DIR/src/main/resources/backend/trusted-mod-sync.js" "$BACKEND_DIR/"
 cp "$V3_DIR/src/main/resources/backend/trusted-mod-discovery.js" "$BACKEND_DIR/"
 cp "$V3_DIR/src/main/resources/backend/performance-profile.js" "$BACKEND_DIR/"
@@ -52,11 +53,11 @@ cat > "$BUILD_DIR/MANIFEST.MF" <<'EOF'
 Manifest-Version: 1.0
 Main-Class: com.cobblemonlegacy.v3.LauncherApp
 Implementation-Title: Cobblemon Legacy Launcher
-Implementation-Version: 3.4.14
+Implementation-Version: 3.4.15
 Created-By: Cobblemon Legacy Community
 
 EOF
 
-OUTPUT="$DIST_DIR/Cobblemon-Legacy-Launcher-3.4.14.jar"
+OUTPUT="$DIST_DIR/Cobblemon-Legacy-Launcher-3.4.15.jar"
 "$JAR" --create --file "$OUTPUT" --manifest "$BUILD_DIR/MANIFEST.MF" -C "$CLASSES_DIR" .
 echo "$OUTPUT"

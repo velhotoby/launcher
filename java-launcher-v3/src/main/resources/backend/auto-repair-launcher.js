@@ -1,102 +1,123 @@
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { Launcher } = require('eml-lib');
-
-const MOD_MISMATCH_PATTERNS = [
-  /mismatched mod set/i,
-  /registry entr(?:y|ies).*unknown/i,
-  /unknown.*registry entr(?:y|ies)/i,
-  /incompatible mod set/i,
-  /mod resolution encountered an incompatible/i,
-  /missing required mods?/i,
-  /requires version .+ of mod/i,
-  /incomplete set of tags received from server/i,
-  /failed to synchronize registries?/i
-];
-
-const IGNORED_NAMESPACES = new Set([
-  'and', 'authlib', 'brigadier', 'c', 'client', 'com', 'fabric', 'forge', 'java',
-  'minecraft', 'more', 'net', 'neoforge', 'org', 'registry', 'server', 'the'
-]);
-
-function mismatchReason(text) {
-  return MOD_MISMATCH_PATTERNS.find((pattern) => pattern.test(text))?.source || null;
-}
-
-function extractNamespaces(text) {
-  const found = new Set();
-  const add = (value) => {
-    const normalized = String(value).toLowerCase();
-    if (/^[a-z][a-z0-9_-]{1,63}$/.test(normalized) && !IGNORED_NAMESPACES.has(normalized)) found.add(normalized);
-  };
-  for (const match of text.matchAll(/\b([a-z][a-z0-9_-]{1,63}):[a-z0-9_./-]+\b/gi)) add(match[1]);
-
-  const marker = text.search(/namespaces? (?:may be )?related/i);
-  if (marker >= 0) {
-    const related = text.slice(marker).split(/\r?\n/).slice(1, 24);
-    for (const line of related) {
-      const cleaned = line.replace(/\[[^\]]+\]/g, ' ').replace(/[^a-z0-9_-]+/gi, ' ').trim();
-      if (/^[a-z][a-z0-9_-]{1,63}$/i.test(cleaned)) add(cleaned);
-    }
-  }
-  return [...found].slice(0, 16);
-}
+const {
+  MAX_LOG_CHARS,
+  analyzeConnectionFailure,
+  configuredServerKeys,
+  extractNamespaces,
+  isConnectionFailure,
+  isJoinComplete,
+  mismatchReason,
+  parseConnectionTarget,
+  saveConnectionDiagnostic
+} = require('./server-error-diagnostics');
 
 class AutoRepairLauncher extends Launcher {
-  constructor(configuration, onRepairDetected = () => {}) {
+  constructor(configuration, { onRepairDetected = () => {}, onDiagnostic = () => {}, servers = [] } = {}) {
     super(configuration);
     this.onRepairDetected_ = onRepairDetected;
+    this.onDiagnostic_ = onDiagnostic;
+    this.serverKeys_ = configuredServerKeys(servers);
     this.repairRequested = null;
+    this.connectionDiagnostic = null;
   }
 
   resetRepairDetection() {
     this.repairRequested = null;
+    this.connectionDiagnostic = null;
   }
 
   async run(javaPath, args) {
     this.launchArgs_ = args;
     return new Promise((resolve, reject) => {
       const minecraft = spawn(javaPath, args, { cwd: this.config.root, detached: false });
-      let recentOutput = '';
+      const pending = { stdout: '', stderr: '' };
+      let connection = null;
       let forceTimer = null;
       let detectionTimer = null;
+      let diagnosticPromise = null;
       let exited = false;
 
-      const inspect = (data) => {
-        const text = data.toString();
-        this.emit('launch_data', text);
-        recentOutput = `${recentOutput}${text}`.slice(-32768);
-        const reason = mismatchReason(recentOutput);
-        if (!reason || this.repairRequested || detectionTimer) return;
-
-        // A lista de namespaces costuma chegar algumas linhas depois da mensagem principal.
-        detectionTimer = setTimeout(() => {
-          const excerpt = recentOutput.split(/\r?\n/).filter(Boolean).slice(-12).join(' ').slice(0, 1600);
-          this.repairRequested = {
-            reason,
-            excerpt,
-            namespaces: extractNamespaces(recentOutput),
-            detectedAt: new Date().toISOString()
-          };
-          this.onRepairDetected_(this.repairRequested);
+      const finalizeDiagnostic = () => {
+        if (diagnosticPromise || !connection || connection.joined) return diagnosticPromise || Promise.resolve();
+        const snapshot = connection;
+        const analysis = analyzeConnectionFailure(snapshot.log);
+        if (!analysis.failure) return Promise.resolve();
+        diagnosticPromise = (async () => {
+          let logPath;
+          try {
+            logPath = await saveConnectionDiagnostic(this.config.root, snapshot.server, snapshot.log, analysis);
+          } catch (error) {
+            this.connectionDiagnostic = { failure: true, error: `Não foi possível salvar o log: ${error.message}` };
+            this.onDiagnostic_(this.connectionDiagnostic);
+            return;
+          }
+          const report = { ...analysis, server: snapshot.server, logPath, detectedAt: new Date().toISOString() };
+          this.connectionDiagnostic = report;
+          this.onDiagnostic_(report);
+          if (!analysis.canRepair || connection !== snapshot) return;
+          this.repairRequested = report;
+          this.onRepairDetected_(report);
+          if (exited) return;
           minecraft.kill();
           forceTimer = setTimeout(() => {
             if (!exited) minecraft.kill('SIGKILL');
           }, 5000);
           forceTimer.unref();
-        }, 750);
+        })();
+        return diagnosticPromise;
       };
 
-      minecraft.stdout.on('data', inspect);
-      minecraft.stderr.on('data', inspect);
+      const processLine = (line) => {
+        const target = parseConnectionTarget(line);
+        if (target) {
+          connection = this.serverKeys_.has(target) ? { server: target, log: `${line}\n`, joined: false } : null;
+          diagnosticPromise = null;
+          if (detectionTimer) clearTimeout(detectionTimer);
+          detectionTimer = null;
+          return;
+        }
+        if (!connection || connection.joined || diagnosticPromise) return;
+        connection.log = `${connection.log}${line}\n`.slice(-MAX_LOG_CHARS);
+        if (isJoinComplete(line)) {
+          connection.joined = true;
+          if (detectionTimer) clearTimeout(detectionTimer);
+          detectionTimer = null;
+          return;
+        }
+        if ((isConnectionFailure(line) || mismatchReason(connection.log)) && !detectionTimer) {
+          // O texto do erro e os namespaces podem chegar em linhas seguintes.
+          detectionTimer = setTimeout(() => {
+            detectionTimer = null;
+            finalizeDiagnostic().catch((error) =>
+              this.onDiagnostic_({ failure: true, error: `Falha ao analisar o log: ${error.message}` }));
+          }, 1200);
+        }
+      };
+
+      const inspect = (data, stream) => {
+        const text = data.toString();
+        this.emit('launch_data', text);
+        const lines = `${pending[stream]}${text}`.split(/\r?\n/);
+        pending[stream] = lines.pop().slice(-MAX_LOG_CHARS);
+        for (const line of lines) processLine(line);
+      };
+
+      minecraft.stdout.on('data', (data) => inspect(data, 'stdout'));
+      minecraft.stderr.on('data', (data) => inspect(data, 'stderr'));
       minecraft.on('error', reject);
-      minecraft.on('exit', (code) => {
+      minecraft.on('exit', async (code) => {
         exited = true;
         if (detectionTimer) clearTimeout(detectionTimer);
         if (forceTimer) clearTimeout(forceTimer);
+        for (const line of Object.values(pending)) if (line) processLine(line);
+        if (detectionTimer) clearTimeout(detectionTimer);
+        try { await finalizeDiagnostic(); }
+        catch (error) { this.onDiagnostic_({ failure: true, error: `Falha ao analisar o log: ${error.message}` }); }
         const exitCode = code ?? -1;
         this.emit('launch_close', exitCode);
-        if (exitCode !== 0 && !this.repairRequested) {
+        if (exitCode !== 0 && !this.repairRequested && !this.connectionDiagnostic) {
           this.emit('launch_crash', {
             code: exitCode,
             date: new Date().toISOString(),

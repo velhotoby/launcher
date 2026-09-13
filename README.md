@@ -16,6 +16,7 @@ O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado au
 - Minecraft 1.21.1, Fabric 0.19.5 e Cobblemon 1.7.3
 - login local e conta original Microsoft/Minecraft
 - sincronização e reparo automático do modpack por fontes confiáveis
+- diagnóstico salvo quando falha a entrada no servidor; mods novos só são descobertos após erro de mod verificável
 - idioma Português (Brasil) e atalhos padronizados
 - três endereços do servidor configurados automaticamente
 - atualização do próprio launcher pela publicação mais recente do GitHub

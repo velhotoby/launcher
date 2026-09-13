@@ -38,6 +38,9 @@ jobs:
           test -f "dist/Cobblemon-Legacy-Launcher-${VERSION}.jar"
           java -jar "dist/Cobblemon-Legacy-Launcher-${VERSION}.jar" --self-test
           node java-launcher-v3/src/main/resources/backend/performance-profile.js --self-test
+          node java-launcher-v3/src/main/resources/backend/server-error-diagnostics.js --self-test
+          node java-launcher-v3/tools/test-server-repair.js
+          node java-launcher-v3/tools/test-mod-discovery.js
 
       - name: Criar ou atualizar Release
         shell: bash

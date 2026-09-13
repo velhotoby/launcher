@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.14";
+    private static final String CURRENT_VERSION = "3.4.15";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -78,7 +78,8 @@ public final class LauncherApp extends JFrame {
                 Process probe = new ProcessBuilder(prepared.node().toString(), "-e",
                         "const e=require('eml-lib');const n=require('prismarine-nbt');" +
                                 "const p=require('./performance-profile');" +
-                                "if(!e.Launcher||!n||!p.detectPerformanceProfile)process.exit(2)")
+                                "const d=require('./server-error-diagnostics');" +
+                                "if(!e.Launcher||!n||!p.detectPerformanceProfile||!d.analyzeConnectionFailure)process.exit(2)")
                         .directory(prepared.backend().getParent().toFile()).inheritIO().start();
                 if (probe.waitFor() != 0) throw new IllegalStateException("Dependências internas indisponíveis.");
                 System.out.println("BACKEND-PROBE OK: núcleo incorporado e Node disponíveis.");
@@ -112,9 +113,9 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.15", "3.4.14")
-                        || UpdateService.isNewer("3.4.14", "3.4.14")
-                        || UpdateService.isNewer("3.4.13", "3.4.14")) {
+                if (!UpdateService.isNewer("3.4.16", "3.4.15")
+                        || UpdateService.isNewer("3.4.15", "3.4.15")
+                        || UpdateService.isNewer("3.4.14", "3.4.15")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 LocalNicknameStore nicknameStore = new LocalNicknameStore(temporary.resolve("nickname.txt"));
@@ -334,7 +335,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.14", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.15", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();

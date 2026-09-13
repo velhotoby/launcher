@@ -2,11 +2,11 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
 const yauzl = require('yauzl');
-const { downloadMod, validateCatalog } = require('./trusted-mod-sync');
+const { downloadMod, validateCatalog, validateFilename } = require('./trusted-mod-sync');
 
 const MODRINTH_API = 'https://api.modrinth.com/v2';
 const DISCOVERED_FILENAME = '.launcher-discovered-mods-v1.json';
-const USER_AGENT = 'CobblemonLegacyLauncher/3.4.14';
+const USER_AGENT = 'CobblemonLegacyLauncher/3.4.15';
 
 async function apiJson(url) {
   const parsed = new URL(url);
@@ -70,7 +70,8 @@ function readFabricIds(filename) {
 
 function descriptor(project, version) {
   const file = version.files.find((candidate) => candidate.primary) || version.files[0];
-  if (!file || !file.hashes?.sha512 || !Number.isSafeInteger(file.size)) return null;
+  if (!file || !validateFilename(file.filename) || !/^[a-f0-9]{128}$/i.test(file.hashes?.sha512 || '')
+      || !Number.isSafeInteger(file.size)) return null;
   return {
     name: project.title || project.name || project.slug || version.name,
     source: 'modrinth',
@@ -88,6 +89,23 @@ async function compatibleVersions(projectId) {
   const loaders = encodeURIComponent(JSON.stringify(['fabric']));
   const versions = encodeURIComponent(JSON.stringify(['1.21.1']));
   return await apiJson(`${MODRINTH_API}/project/${encodeURIComponent(projectId)}/version?loaders=${loaders}&game_versions=${versions}`) || [];
+}
+
+function versionMatches(versionNumber, requirement) {
+  if (!requirement.requiredVersion) return true;
+  if (requirement.rule !== 'minimum') return versionNumber === requirement.requiredVersion;
+  const numeric = (value) => {
+    const match = String(value).match(/^(\d+(?:\.\d+){0,3})(?:[+._-].*)?$/);
+    return match ? match[1].split('.').map(Number) : null;
+  };
+  const current = numeric(versionNumber);
+  const required = numeric(requirement.requiredVersion);
+  if (!current || !required) return false;
+  for (let index = 0; index < Math.max(current.length, required.length); index += 1) {
+    const difference = (current[index] || 0) - (required[index] || 0);
+    if (difference !== 0) return difference > 0;
+  }
+  return true;
 }
 
 async function candidatesFor(namespace) {
@@ -116,9 +134,22 @@ async function loadDiscovered(gamePath) {
   }
 }
 
-async function discoverMissingMods(namespaces, gamePath, configuration = {}, notify = () => {}) {
-  if (configuration.allowModrinthDiscovery === false || !Array.isArray(namespaces) || namespaces.length === 0) {
-    return { addedCount: 0, namespaces: [] };
+async function discoverMissingMods(requirements, namespaces, gamePath, configuration = {}, notify = () => {}) {
+  const requested = new Map();
+  const allowedNamespaces = new Set(Array.isArray(namespaces) ? namespaces : []);
+  for (const requirement of Array.isArray(requirements) ? requirements : []) {
+    if (requirement && allowedNamespaces.has(requirement.id)
+        && /^[a-z][a-z0-9_-]{1,63}$/.test(requirement.id)) {
+      requested.set(requirement.id, requirement);
+    }
+  }
+  for (const namespace of Array.isArray(namespaces) ? namespaces : []) {
+    if (/^[a-z][a-z0-9_-]{1,63}$/.test(namespace) && !requested.has(namespace)) {
+      requested.set(namespace, { id: namespace, name: namespace, requiredVersion: null, rule: 'unknown' });
+    }
+  }
+  if (configuration.allowModrinthDiscovery === false || requested.size === 0) {
+    return { addedCount: 0, namespaces: [], resolved: [] };
   }
   const embedded = require('./trusted-mod-catalog.json');
   const discovered = await loadDiscovered(gamePath);
@@ -129,6 +160,7 @@ async function discoverMissingMods(namespaces, gamePath, configuration = {}, not
   await fsp.rm(temporaryDirectory, { recursive: true, force: true });
   await fsp.mkdir(temporaryDirectory, { recursive: true });
   const resolvedNamespaces = [];
+  const resolved = [];
 
   async function addDependencies(version, seen = new Set()) {
     for (const dependency of version.dependencies || []) {
@@ -149,12 +181,19 @@ async function discoverMissingMods(namespaces, gamePath, configuration = {}, not
   }
 
   try {
-    for (const namespace of [...new Set(namespaces)].slice(0, 16)) {
-      notify({ type: 'status', message: `Procurando o mod ${namespace} no Modrinth...` });
+    for (const requirement of [...requested.values()].slice(0, 16)) {
+      const namespace = requirement.id;
+      notify({ type: 'status', message: `Procurando ${requirement.name}` +
+        (requirement.requiredVersion ? ` ${requirement.requiredVersion}` : '') + ' no Modrinth...' });
       let matched = false;
       for (const project of await candidatesFor(namespace)) {
-        if (knownProjects.has(project.id)) continue;
-        for (const version of (await compatibleVersions(project.id)).slice(0, 4)) {
+        if (knownProjects.has(project.id)) {
+          notify({ type: 'status', message: `${namespace} já consta no modpack; confira a versão no manifesto do servidor.` });
+          continue;
+        }
+        const versions = (await compatibleVersions(project.id)).filter((version) =>
+          versionMatches(version.version_number, requirement));
+        for (const version of versions.slice(0, 4)) {
           const mod = descriptor(project, version);
           if (!mod || knownFiles.has(mod.filename)) continue;
           const probe = path.join(temporaryDirectory, mod.filename);
@@ -173,12 +212,22 @@ async function discoverMissingMods(namespaces, gamePath, configuration = {}, not
           knownProjects.add(mod.projectId);
           knownFiles.add(mod.filename);
           resolvedNamespaces.push(namespace);
+          resolved.push({
+            id: namespace,
+            name: mod.name,
+            versionNumber: mod.versionNumber,
+            requiredVersion: requirement.requiredVersion,
+            source: mod.source
+          });
           await addDependencies(version);
           matched = true;
-          notify({ type: 'status', message: `${namespace} identificado com segurança como ${mod.name}.` });
+          notify({ type: 'status', message: `${namespace} identificado com segurança como ${mod.name} ${mod.versionNumber}.` });
           break;
         }
         if (matched) break;
+      }
+      if (!matched && requirement.requiredVersion) {
+        notify({ type: 'status', message: `Nenhum arquivo Fabric 1.21.1 confirmado para ${namespace} ${requirement.requiredVersion}.` });
       }
     }
 
@@ -195,10 +244,10 @@ async function discoverMissingMods(namespaces, gamePath, configuration = {}, not
       await fsp.writeFile(`${destination}.tmp`, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
       await fsp.rename(`${destination}.tmp`, destination);
     }
-    return { addedCount: mods.length - discovered.length, namespaces: resolvedNamespaces };
+    return { addedCount: mods.length - discovered.length, namespaces: resolvedNamespaces, resolved };
   } finally {
     await fsp.rm(temporaryDirectory, { recursive: true, force: true });
   }
 }
 
-module.exports = { discoverMissingMods, readFabricIds };
+module.exports = { discoverMissingMods, readFabricIds, versionMatches };

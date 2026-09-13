@@ -5,6 +5,7 @@ const config = require('./launcher-config.json');
 const { AutoRepairLauncher } = require('./auto-repair-launcher');
 const { syncTrustedMods } = require('./trusted-mod-sync');
 const { discoverMissingMods } = require('./trusted-mod-discovery');
+const { appendDiagnosticOutcome } = require('./server-error-diagnostics');
 const { ensureServer } = require('./server-list');
 const { installReliableFetch } = require('./fetch-retry');
 const { ensureBundledMinecraftFiles } = require('./minecraft-fallback');
@@ -83,6 +84,7 @@ async function main() {
   const requestedPerformance = process.argv[4] === 'low' ? 'low' : '';
   emit('status', mode === 'microsoft' ? `Conta Microsoft: ${account.name}` : `Perfil local: ${account.name}`);
   const performance = detectPerformanceProfile(requestedPerformance);
+  const configuredServers = Array.isArray(config.servers) ? config.servers : [config.server].filter(Boolean);
   emit('status', `PC detectado: ${Math.round(performance.detectedMemoryMB / 1024)} GB de RAM, ` +
     `${performance.logicalCpuCount} processadores lógicos. Perfil ${performance.label}, ` +
     `${performance.memory.max} MB para o Minecraft.${requestedPerformance ? ' Modo PC Fraco ativado.' : ''}`);
@@ -97,7 +99,16 @@ async function main() {
     cleaning: { ignored: IGNORED_PATHS },
     java: { args: performance.javaArgs },
     memory: performance.memory
-  }, () => emit('status', 'Diferença de mods detectada. Fechando o jogo para reparar...'));
+  }, {
+    servers: configuredServers,
+    onRepairDetected: () => emit('status', 'Erro de mod ao entrar no servidor. Fechando o jogo para reparar...'),
+    onDiagnostic: (diagnostic) => {
+      if (diagnostic.error) emit('error', diagnostic.error);
+      else emit(diagnostic.canRepair ? 'status' : 'error',
+        `Falha ao entrar no servidor. Log salvo em ${diagnostic.logPath}.` +
+        (diagnostic.canRepair ? ' Identificando o mod...' : ' Nenhum mod foi baixado sem identificação segura.'));
+    }
+  });
 
   launcher.on('launch_compute_download', () => emit('status', 'Calculando arquivos do Minecraft...'));
   launcher.on('launch_download', ({ total }) => emit('progress', `${total.amount} arquivo(s) do Minecraft para baixar.`, 0, total.size));
@@ -108,6 +119,9 @@ async function main() {
   launcher.on('launch_launch', () => emit('running', 'Cobblemon iniciado em Português (Brasil). Boa aventura!'));
   launcher.on('launch_close', (code) => {
     if (launcher.repairRequested) emit('status', 'Minecraft fechado pelo autorreparo. Verificando mods...');
+    else if (launcher.connectionDiagnostic?.failure) emit('error', launcher.connectionDiagnostic.logPath
+      ? `Falha ao entrar no servidor. Consulte ${launcher.connectionDiagnostic.logPath}.`
+      : launcher.connectionDiagnostic.error);
     else emit(code === 0 ? 'success' : 'error', code === 0
       ? 'Jogo encerrado normalmente.' : `O jogo encerrou com o código ${code ?? 'desconhecido'}.`);
   });
@@ -118,7 +132,6 @@ async function main() {
     emit('status', `Conexão instável com ${hostname}. Tentando novamente (${attempt}/${totalAttempts})...`);
   });
   await syncTrustedMods(launcher.config.root, config.trustedSync, report);
-  const configuredServers = Array.isArray(config.servers) ? config.servers : [config.server].filter(Boolean);
   let addedServers = 0;
   for (const configuredServer of configuredServers) {
     const result = await ensureServer(launcher.config.root, configuredServer);
@@ -141,21 +154,47 @@ async function main() {
       launcher.resetRepairDetection();
       await launcher.launch();
       if (!launcher.repairRequested) break;
+      const diagnostic = launcher.repairRequested;
+      const recordOutcome = async (message) => {
+        try { await appendDiagnosticOutcome(diagnostic.logPath, message); }
+        catch (error) { emit('error', `Não foi possível completar o log de conexão: ${error.message}`); }
+      };
       if (attempt >= maximumRepairs) {
+        await recordOutcome('Limite de tentativas de reparo atingido.');
         throw new Error('O servidor ainda exige mods diferentes depois do autorreparo. O manifesto do servidor precisa ser atualizado.');
       }
 
       emit('status', `Autorreparo de mods (${attempt + 1}/${maximumRepairs})...`);
-      const discovery = await discoverMissingMods(
-        launcher.repairRequested.namespaces, launcher.config.root, config.trustedSync, report
-      );
+      let discovery;
+      try {
+        discovery = await discoverMissingMods(
+          diagnostic.requirements, diagnostic.namespaces, launcher.config.root, config.trustedSync, report
+        );
+      } catch (error) {
+        await recordOutcome(`Falha ao identificar o mod: ${error.message}`);
+        throw error;
+      }
       if (discovery.addedCount > 0) {
         emit('status', `${discovery.addedCount} mod(s) identificado(s) em fonte confiável.`);
+        for (const mod of discovery.resolved) {
+          await recordOutcome(`Identificado no Modrinth: ${mod.name} (${mod.id}) versão ${mod.versionNumber}` +
+            (mod.requiredVersion ? `; exigida pelo erro: ${mod.requiredVersion}` : '; versão exigida não informada pelo servidor'));
+        }
+      } else {
+        await recordOutcome('Nenhum mod novo pôde ser identificado com segurança.');
       }
-      const repaired = await syncTrustedMods(launcher.config.root, config.trustedSync, report);
+      let repaired;
+      try {
+        repaired = await syncTrustedMods(launcher.config.root, config.trustedSync, report);
+      } catch (error) {
+        await recordOutcome(`Falha ao baixar ou verificar o mod: ${error.message}`);
+        throw error;
+      }
       if (repaired.changedCount === 0) {
+        await recordOutcome('Nenhum arquivo novo foi instalado; reinício automático cancelado.');
         throw new Error('O servidor exige um mod que ainda não consta no manifesto confiável. Atualize o manifesto do servidor para permitir o download seguro.');
       }
+      await recordOutcome(`${repaired.changedCount} alteração(ões) de mod instalada(s); reiniciando o Minecraft.`);
       emit('status', `${repaired.changedCount} alteração(ões) aplicada(s). Reiniciando o Minecraft automaticamente...`);
     }
   } finally { restoreFetch(); }
