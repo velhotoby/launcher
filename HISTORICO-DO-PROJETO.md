@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.18`
-- Tag estável: `v3.4.18`
-- Versão local em teste: `3.4.19`
+- Versão estável publicada: `3.4.19`
+- Tag estável: `v3.4.19`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.18.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.19.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.18`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.19.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.19`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +38,7 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Banner centralizado — versão 3.4.19 local
+## Banner centralizado — versão 3.4.19
 
 - A arte panorâmica original é exibida inteira, proporcional e centralizada no cartão visual,
   evitando o corte das laterais que ocorria com o preenchimento pela altura
@@ -213,6 +211,13 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR 3.4.19 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
+  `933038fc64002695609707e989e8cb77215852405fd0e60a3b3521b5b2224aec`
+- Manifesto do JAR público: `Implementation-Version: 3.4.19` e classe principal confirmados
+- Workflow de publicação `34777443468`: aprovado, incluindo todos os testes e a retenção
+- Retenção após a publicação: versões rotativas `3.4.19` e `3.4.18`, além da permanente
+  `3.4.11`; os assets `Cobblemon-Legacy-Launcher-3.4.11.jar` e
+  `Cobblemon-Legacy-Launcher-Installer.exe` continuam disponíveis
 - `3.4.19` local: compilação, `--self-test` e `--backend-probe` isolado aprovados
 - Prévia do componente do banner renderizada sem abrir o launcher em `746 × 535` e inspecionada
   visualmente; a arte inteira, incluindo personagem e logotipo, aparece centralizada
