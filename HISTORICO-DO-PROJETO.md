@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.13`
-- Tag estável: `v3.4.13`
-- Versão local em teste: `3.4.14`
+- Versão estável publicada: `3.4.14`
+- Tag estável: `v3.4.14`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.13.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.14.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.13`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.14.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.14`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -53,7 +51,7 @@ Nome principal exibido: `cubblemon legacy`.
 ## Login
 
 - Perfil local disponível
-- Na versão local `3.4.14`, o checkbox `Lembrar de mim?` salva somente o nickname do perfil local
+- Desde a versão `3.4.14`, o checkbox `Lembrar de mim?` salva somente o nickname do perfil local
   em `~/.cobblemon_legacy_launcher/local-nickname.txt` no Linux ou
   `%USERPROFILE%\.cobblemon_legacy_launcher\local-nickname.txt` no Windows
 - O nickname válido é restaurado na próxima abertura; desmarcar a opção apaga o arquivo local
@@ -152,6 +150,11 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR 3.4.14 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
+  `8d241db74f25dab98dad50a21af732548267f8234531f023491bd1edfe0c7bac`
+- Workflow de publicação `34729639580`: aprovado
+- Retenção após a publicação: versões `3.4.14`, `3.4.13` e a permanente `3.4.11`
+- Assets permanentes da `v3.4.11` (`JAR` e instalador `EXE`): presentes no GitHub
 - JAR local `3.4.14`: autoteste de gravação, restauração, alteração e exclusão do nickname aprovado
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.14.jar --self-test`: aprovado
 - `--backend-probe` do JAR `3.4.14` com perfil temporário isolado: aprovado
