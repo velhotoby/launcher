@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.14`
-- Tag estável: `v3.4.14`
-- Versão local em teste: `3.4.15`
+- Versão estável publicada: `3.4.15`
+- Tag estável: `v3.4.15`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.14.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.14`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.15`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -80,7 +78,7 @@ Nome principal exibido: `cubblemon legacy`.
   ausente com correspondência exata e confiável, baixa o mod e reinicia o Minecraft
 - A identificação automática exige confirmação do ID dentro de `fabric.mod.json`
 
-## Diagnóstico de entrada no servidor — versão 3.4.15 local
+## Diagnóstico de entrada no servidor — versão 3.4.15
 
 - O modpack básico continua sendo sincronizado antes do jogo; a descoberta de mods **novos**
   ocorre somente após erro de mod ao entrar em um dos três servidores configurados
@@ -172,6 +170,14 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR 3.4.15 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
+  `0d094da13ab910f4f20a9788754d7a3125aa566a869aa17ed1fffe5ad4a37bfe`
+- Manifesto do JAR público: `Implementation-Version: 3.4.15` e classe principal confirmadas
+- Workflow de publicação `34735179687`: aprovado, inclusive os testes de diagnóstico, reparo e
+  descoberta de mods
+- Retenção após a publicação: versões `3.4.15`, `3.4.14` e a permanente `3.4.11`; os assets
+  permanentes `Cobblemon-Legacy-Launcher-3.4.11.jar` e
+  `Cobblemon-Legacy-Launcher-Installer.exe` continuam presentes no GitHub
 - `node java-launcher-v3/src/main/resources/backend/server-error-diagnostics.js --self-test`: aprovado
 - `node java-launcher-v3/tools/test-server-repair.js`: aprovado para outro servidor, falha de
   rede, desconexão após entrada, mod ausente e namespaces de registro
