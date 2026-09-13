@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.17`
-- Tag estável: `v3.4.17`
-- Versão local em teste: `3.4.18`
+- Versão estável publicada: `3.4.18`
+- Tag estável: `v3.4.18`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.17.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.18.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.17`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.18.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.18`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +38,7 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Abrir diretório — versão 3.4.18 local
+## Abrir diretório — versão 3.4.18
 
 - O painel inclui o botão `ABRIR DIRETÓRIO` ao lado de `DESINSTALAR`, mantendo a altura da área
   de ações e o visual atual
@@ -203,6 +201,13 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR 3.4.18 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
+  `21ca5f1fbee5c9d389fca9501ef745b0f6fdc2f5ea913f739fc5d40add7ea605`
+- Manifesto do JAR público: `Implementation-Version: 3.4.18` e classe principal confirmados
+- Workflow de publicação `34774697163`: aprovado, incluindo todos os testes e a retenção
+- Retenção após a publicação: versões rotativas `3.4.18` e `3.4.17`, além da permanente
+  `3.4.11`; os assets `Cobblemon-Legacy-Launcher-3.4.11.jar` e
+  `Cobblemon-Legacy-Launcher-Installer.exe` continuam disponíveis
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.18.jar --self-test`: aprovado para criação da
   pasta da instância em perfil temporário, localização em `%APPDATA%` no Windows e seleção dos
   comandos Linux/Windows, além dos autotestes anteriores
