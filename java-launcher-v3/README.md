@@ -1,8 +1,8 @@
-# Cobblemon Legacy Launcher 3.4.16
+# Cobblemon Legacy Launcher 3.4.17
 
 Versão Java multiplataforma do launcher da comunidade.
 
-O visual 3.4.16 reproduz a identidade do site oficial: banner da comunidade, tipografia
+O visual 3.4.17 reproduz a identidade do site oficial: banner da comunidade, tipografia
 Chakra Petch/Inter, cartões creme com contornos escuros e a paleta vermelho, azul e verde.
 As funções e configurações da versão 3.4.6 foram preservadas.
 
@@ -22,7 +22,8 @@ e `sensible-browser`, além de um botão para repetir a abertura ou copiar o end
 - sincronização por manifesto confiável, sem Google Drive
 - idioma do jogo fixado em Português (Brasil), sem apagar as demais opções
 - minimapa do Xaero posicionado no lado direito antes de abrir o Minecraft; as outras opções
-  em `config/xaerohud.txt` são preservadas
+  em `config/xaerohud.txt` são preservadas. A limpeza interna também preserva a pasta `config/`
+  e os dados de mapa em `xaero/`, evitando que o jogo recrie a posição padrão à esquerda
 - perfil local e login original Microsoft/Minecraft por código de dispositivo, usando MinecraftAuth 5.0.2
 - opção `Lembrar de mim?` para guardar apenas o nickname local em
   `~/.cobblemon_legacy_launcher/local-nickname.txt` no Linux ou
@@ -33,7 +34,7 @@ e `sensible-browser`, além de um botão para repetir a abertura ou copiar o end
 
 ## Desempenho automático
 
-A versão 3.4.16 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
+A versão 3.4.17 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
 o Minecraft. Com esses dados, seleciona um perfil econômico, equilibrado ou de alto desempenho e
 define uma quantidade segura de RAM para a JVM (de 2 a 6 GB, conforme o computador).
 
@@ -53,11 +54,11 @@ A versão baixada abre em um processo independente no Linux e no Windows. Depois
 janela inicia, ela valida e exclui somente o JAR anterior do Cobblemon Legacy Launcher; arquivos
 que não correspondam a uma versão válida e mais antiga nunca entram nessa limpeza.
 
-Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.16.jar`.
+Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.17.jar`.
 
 ## Sincronização de mods
 
-A versão 3.4.16 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
+A versão 3.4.17 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
 baixados apenas de hosts HTTPS aprovados (Modrinth CDN, CurseForge CDN e Maven oficial da FTB),
 sempre com validação de tamanho e SHA-512.
 

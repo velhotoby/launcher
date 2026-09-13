@@ -12,19 +12,10 @@ const { ensureBundledMinecraftFiles } = require('./minecraft-fallback');
 const { applyDefaultKeybinds } = require('./keybinds');
 const { applyPerformanceProfile, detectPerformanceProfile } = require('./performance-profile');
 const { ensureMinimapOnRight } = require('./xaero-minimap');
+const IGNORED_PATHS = require('./preserved-paths');
 
 const INSTANCE_ID = 'cobblemon-legacy';
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
-const IGNORED_PATHS = [
-  'crash-reports/', 'logs/', 'resourcepacks/', 'resources/', 'saves/',
-  'shaderpacks/', 'options.txt', 'optionsof.txt', 'mods/', 'servers.dat',
-  '.launcher-drive-sync-v2.json', '.launcher-modrinth-sync-v1.json', '.launcher-cache-v2/',
-  '.launcher-keybinds-v1.json', '.launcher-trusted-sync-v1.json',
-  '.launcher-performance-v1.json',
-  '.launcher-discovered-mods-v1.json', '.launcher-mods-quarantine-v1/',
-  '.launcher-mods-staging-v1/', '.launcher-mod-discovery-v1/'
-];
-
 function emit(type, message, current = 0, total = 0) {
   const encoded = Buffer.from(String(message), 'utf8').toString('base64');
   process.stdout.write(`@@COBBLEMON\t${type}\t${current}\t${total}\t${encoded}\n`);

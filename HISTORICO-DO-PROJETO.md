@@ -12,10 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.15`
 - Tag estável: `v3.4.15`
-- Versão local em teste: `3.4.16`
+- Versão local em teste: `3.4.17`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.16.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.17.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.15`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -40,10 +40,18 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Posição do minimapa — versão 3.4.16 local
+## Posição do minimapa — versão 3.4.17 local
 
-- Antes de iniciar o Minecraft, o launcher configura o Xaero's Minimap no lado direito por meio
-  de `config/xaerohud.txt` na instância do jogador
+- A 3.4.16 configurava o minimapa à direita antes de iniciar o Minecraft, mas a limpeza do
+  `eml-lib` apagava `config/xaerohud.txt` logo depois; o Xaero o recriava à esquerda
+- Na execução real de 13/09/2026, o backend `3.4.16-r1` foi usado e o arquivo voltou a
+  `fromRight=false` durante a inicialização do jogo; isso confirmou a falha, não apenas o
+  uso anterior de um JAR antigo
+- A 3.4.17 preserva `config/` e `xaero/` na limpeza pré-jogo, além de capturas de tela,
+  caminhos antigos de waypoints e backups Xaero; a limpeza continua ativa para arquivos não
+  protegidos
+- Antes de iniciar o Minecraft, configura o Xaero's Minimap no lado direito por meio de
+  `config/xaerohud.txt` na instância do jogador
 - Aplica `x=0`, `centered=false` e `fromRight=true` apenas ao módulo
   `xaerominimap:minimap`; mantém a posição vertical e as demais preferências/módulos
 - Cria a linha do módulo quando o arquivo ainda não existe, sem alterar a instância real nos testes
@@ -181,6 +189,18 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- `node java-launcher-v3/tools/test-xaero-minimap.js` na 3.4.17: aprovado também contra a
+  rotina real de limpeza do `eml-lib`, confirmando que `config/xaerohud.txt` e `xaero/` são
+  preservados enquanto um arquivo descartável é removido
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.17.jar --self-test`: aprovado
+- `--backend-probe` do JAR `3.4.17` em perfil temporário isolado: aprovado
+- Manifesto do JAR `3.4.17`: `Implementation-Version: 3.4.17` confirmado
+- SHA-256 local do JAR `3.4.17`:
+  `3271083342b595ef4d5379388719dfe2b59b81247035a4708d765f9365e0217d`
+- Testes existentes de diagnóstico, reparo de servidor, descoberta de mods e desempenho:
+  aprovados na 3.4.17
+- O Minecraft ainda estava aberto durante a correção; não foi encerrado nem reiniciado para
+  validar visualmente a nova versão no jogo real
 - `node java-launcher-v3/tools/test-xaero-minimap.js`: aprovado para criação, preservação dos
   demais módulos, atualização de uma configuração existente, CRLF e idempotência
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.16.jar --self-test`: aprovado
@@ -189,7 +209,7 @@ SHA-256 do instalador publicado:
 - SHA-256 local do JAR `3.4.16`:
   `6bbe3796f31d5f8d9aa7598237b67ce437d589e345e1c664bdfaa107afbe41db`
 - Testes existentes de diagnóstico, reparo de servidor, descoberta de mods e desempenho: aprovados
-- A posição visual em uma sessão real do Minecraft ainda não foi validada
+- A 3.4.16 falhou no teste real porque a limpeza pré-jogo apagou o arquivo de configuração
 - JAR 3.4.15 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
   `0d094da13ab910f4f20a9788754d7a3125aa566a869aa17ed1fffe5ad4a37bfe`
 - Manifesto do JAR público: `Implementation-Version: 3.4.15` e classe principal confirmadas
