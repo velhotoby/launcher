@@ -11,6 +11,7 @@ const { installReliableFetch } = require('./fetch-retry');
 const { ensureBundledMinecraftFiles } = require('./minecraft-fallback');
 const { applyDefaultKeybinds } = require('./keybinds');
 const { applyPerformanceProfile, detectPerformanceProfile } = require('./performance-profile');
+const { ensureMinimapOnRight } = require('./xaero-minimap');
 
 const INSTANCE_ID = 'cobblemon-legacy';
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
@@ -147,6 +148,8 @@ async function main() {
   emit('status', performanceResult.changed
     ? `Minecraft otimizado para o perfil ${performance.label}: ${performanceResult.count} ajustes aplicados.`
     : `Perfil de desempenho ${performance.label} já está configurado.`);
+  const minimap = ensureMinimapOnRight(launcher.config.root);
+  if (minimap.changed) emit('status', 'Minimapa configurado no lado direito.');
 
   const maximumRepairs = config.autoRepair?.enabled === false ? 0 : Math.max(1, Number(config.autoRepair?.maxAttempts) || 1);
   try {

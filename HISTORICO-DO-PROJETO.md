@@ -12,8 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.15`
 - Tag estável: `v3.4.15`
+- Versão local em teste: `3.4.16`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.16.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.15`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -37,6 +39,15 @@ as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Posição do minimapa — versão 3.4.16 local
+
+- Antes de iniciar o Minecraft, o launcher configura o Xaero's Minimap no lado direito por meio
+  de `config/xaerohud.txt` na instância do jogador
+- Aplica `x=0`, `centered=false` e `fromRight=true` apenas ao módulo
+  `xaerominimap:minimap`; mantém a posição vertical e as demais preferências/módulos
+- Cria a linha do módulo quando o arquivo ainda não existe, sem alterar a instância real nos testes
+- A operação é idempotente: ao encontrar os valores desejados, não regrava o arquivo
 
 ## Servidores configurados
 
@@ -170,6 +181,15 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- `node java-launcher-v3/tools/test-xaero-minimap.js`: aprovado para criação, preservação dos
+  demais módulos, atualização de uma configuração existente, CRLF e idempotência
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.16.jar --self-test`: aprovado
+- `--backend-probe` do JAR `3.4.16` com perfil temporário isolado: aprovado
+- Manifesto do JAR `3.4.16`: `Implementation-Version: 3.4.16` confirmado
+- SHA-256 local do JAR `3.4.16`:
+  `6bbe3796f31d5f8d9aa7598237b67ce437d589e345e1c664bdfaa107afbe41db`
+- Testes existentes de diagnóstico, reparo de servidor, descoberta de mods e desempenho: aprovados
+- A posição visual em uma sessão real do Minecraft ainda não foi validada
 - JAR 3.4.15 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
   `0d094da13ab910f4f20a9788754d7a3125aa566a869aa17ed1fffe5ad4a37bfe`
 - Manifesto do JAR público: `Implementation-Version: 3.4.15` e classe principal confirmadas
