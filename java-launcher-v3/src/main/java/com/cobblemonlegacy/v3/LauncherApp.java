@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.18";
+    private static final String CURRENT_VERSION = "3.4.19";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -117,10 +117,17 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.19", "3.4.18")
-                        || UpdateService.isNewer("3.4.18", "3.4.18")
-                        || UpdateService.isNewer("3.4.17", "3.4.18")) {
+                if (!UpdateService.isNewer("3.4.20", "3.4.19")
+                        || UpdateService.isNewer("3.4.19", "3.4.19")
+                        || UpdateService.isNewer("3.4.18", "3.4.19")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
+                }
+                Rectangle bannerFrame = BannerPanel.centeredBounds(2, 2, 688, 500, 1983, 793);
+                if (bannerFrame.x < 2 || bannerFrame.y < 2 || bannerFrame.x + bannerFrame.width > 690
+                        || bannerFrame.y + bannerFrame.height > 502
+                        || Math.abs(bannerFrame.getCenterX() - 346) > 1
+                        || Math.abs(bannerFrame.getCenterY() - 252) > 1) {
+                    throw new IllegalStateException("Falha ao centralizar o banner sem cortar a imagem.");
                 }
                 LocalNicknameStore nicknameStore = new LocalNicknameStore(temporary.resolve("nickname.txt"));
                 nicknameStore.save("Treinador_42");
@@ -163,7 +170,7 @@ public final class LauncherApp extends JFrame {
                 Files.delete(instance);
                 Files.delete(options);
                 Files.delete(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, pasta da instância, nickname local e cancelamento Microsoft.");
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, banner centralizado, pasta da instância, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -360,7 +367,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.18", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.19", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -982,6 +989,18 @@ public final class LauncherApp extends JFrame {
     private static final class BannerPanel extends JPanel {
         private final BufferedImage banner;
 
+        static Rectangle centeredBounds(int areaX, int areaY, int areaWidth, int areaHeight,
+                                        int imageWidth, int imageHeight) {
+            int availableWidth = Math.max(1, areaWidth - 24);
+            int availableHeight = Math.max(1, areaHeight - 24);
+            double scale = Math.min(availableWidth / (double) imageWidth,
+                    availableHeight / (double) imageHeight);
+            int width = Math.max(1, (int) Math.floor(imageWidth * scale));
+            int height = Math.max(1, (int) Math.floor(imageHeight * scale));
+            return new Rectangle(areaX + (areaWidth - width) / 2,
+                    areaY + (areaHeight - height) / 2, width, height);
+        }
+
         BannerPanel() {
             setOpaque(false);
             setMinimumSize(new Dimension(300, 300));
@@ -995,21 +1014,38 @@ public final class LauncherApp extends JFrame {
             Graphics2D g = (Graphics2D) original.create();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            Shape clip = new RoundRectangle2D.Float(2, 2, getWidth() - 12, getHeight() + 24, 24, 24);
+            int areaX = 2;
+            int areaY = 2;
+            int areaWidth = Math.max(1, getWidth() - 12);
+            int areaHeight = Math.max(1, getHeight() - 2);
+            Shape clip = new RoundRectangle2D.Float(areaX, areaY, areaWidth, areaHeight, 24, 24);
             g.setClip(clip);
             if (banner != null) {
-                double scale = Math.max((getWidth() - 10) / (double) banner.getWidth(), getHeight() / (double) banner.getHeight());
-                int width = (int) Math.ceil(banner.getWidth() * scale);
-                int height = (int) Math.ceil(banner.getHeight() * scale);
-                int x = (getWidth() - 10 - width) / 2 + 2;
-                int y = (getHeight() - height) / 2;
-                g.drawImage(banner, x, y, width, height, null);
+                double backgroundScale = Math.max(areaWidth / (double) banner.getWidth(),
+                        areaHeight / (double) banner.getHeight());
+                int backgroundWidth = (int) Math.ceil(banner.getWidth() * backgroundScale);
+                int backgroundHeight = (int) Math.ceil(banner.getHeight() * backgroundScale);
+                g.drawImage(banner, areaX + (areaWidth - backgroundWidth) / 2,
+                        areaY + (areaHeight - backgroundHeight) / 2,
+                        backgroundWidth, backgroundHeight, null);
+                g.setColor(new Color(17, 35, 52, 155));
+                g.fillRect(areaX, areaY, areaWidth, areaHeight);
+
+                Rectangle frame = centeredBounds(areaX, areaY, areaWidth, areaHeight,
+                        banner.getWidth(), banner.getHeight());
+                g.setColor(new Color(10, 24, 39, 130));
+                g.fillRoundRect(frame.x + 3, frame.y + 5, frame.width, frame.height, 18, 18);
+                g.setClip(new RoundRectangle2D.Float(frame.x, frame.y,
+                        frame.width, frame.height, 18, 18));
+                g.drawImage(banner, frame.x, frame.y, frame.width, frame.height, null);
+                g.setClip(clip);
+                g.setStroke(new BasicStroke(2));
+                g.setColor(new Color(255, 248, 226, 215));
+                g.drawRoundRect(frame.x, frame.y, frame.width - 1, frame.height - 1, 18, 18);
             } else {
                 g.setPaint(new GradientPaint(0, 0, SKY, getWidth(), getHeight(), YELLOW));
-                g.fillRect(2, 2, getWidth() - 10, getHeight());
+                g.fillRect(areaX, areaY, areaWidth, areaHeight);
             }
-            g.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 15), 0, getHeight(), new Color(27, 40, 61, 35)));
-            g.fillRect(2, 2, getWidth() - 10, getHeight());
             g.setClip(null);
             g.setColor(new Color(255, 248, 226, 225));
             g.fillRoundRect(21, 18, 176, 28, 18, 18);

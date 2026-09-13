@@ -12,8 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.18`
 - Tag estável: `v3.4.18`
+- Versão local em teste: `3.4.19`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.18.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.19.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.18`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -37,6 +39,16 @@ as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Banner centralizado — versão 3.4.19 local
+
+- A arte panorâmica original é exibida inteira, proporcional e centralizada no cartão visual,
+  evitando o corte das laterais que ocorria com o preenchimento pela altura
+- Uma cópia escurecida da própria imagem ocupa o fundo do cartão, mantendo a área preenchida sem
+  competir com o banner nítido no centro
+- A imagem nítida recebe contorno suave, cantos arredondados e sombra discreta; o restante do
+  visual e as funções da versão 3.4.18 foram preservados
+- O autoteste verifica que o enquadramento cabe na área e mantém os centros alinhados
 
 ## Abrir diretório — versão 3.4.18
 
@@ -201,6 +213,13 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- `3.4.19` local: compilação, `--self-test` e `--backend-probe` isolado aprovados
+- Prévia do componente do banner renderizada sem abrir o launcher em `746 × 535` e inspecionada
+  visualmente; a arte inteira, incluindo personagem e logotipo, aparece centralizada
+- Testes de desempenho, diagnóstico, minimapa, reparo de servidor e descoberta de mods: aprovados
+- Manifesto do JAR `3.4.19`: `Implementation-Version: 3.4.19` confirmado
+- SHA-256 local do JAR `3.4.19`:
+  `48552469c0b50e7524d875e8e6f417a9f2a3116cb820976364aca1378407b3fe`
 - JAR 3.4.18 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
   `21ca5f1fbee5c9d389fca9501ef745b0f6fdc2f5ea913f739fc5d40add7ea605`
 - Manifesto do JAR público: `Implementation-Version: 3.4.18` e classe principal confirmados
