@@ -12,8 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.17`
 - Tag estável: `v3.4.17`
+- Versão local em teste: `3.4.18`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.17.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.18.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.17`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -32,11 +34,25 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Fabric Loader `0.19.5`
 - Cobblemon `1.7.3`
 - Pasta da instância: `~/.cobblemon_legacy` no Linux e
-  `%USERPROFILE%\.cobblemon_legacy` no Windows
+  `%APPDATA%\.cobblemon_legacy` no Windows (pasta usada pelo `eml-lib`)
 - Pasta interna do launcher: `~/.cobblemon_legacy_launcher` no Linux e
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Abrir diretório — versão 3.4.18 local
+
+- O painel inclui o botão `ABRIR DIRETÓRIO` ao lado de `DESINSTALAR`, mantendo a altura da área
+  de ações e o visual atual
+- Abre a pasta da instância `~/.cobblemon_legacy` no Linux ou
+  `%APPDATA%\.cobblemon_legacy` no Windows, onde ficam os mods e arquivos do jogo
+- Cria a pasta se ainda não existir; tenta a integração padrão do Java com o gerenciador de
+  arquivos e usa `xdg-open`/`gio` no Linux ou `explorer.exe` no Windows como alternativa
+- O caminho Windows foi corrigido ao conferir o cálculo da biblioteca `eml-lib`; a verificação
+  de segurança de `Desinstalar` usa a mesma localização para não recusar a instância real
+- A abertura ocorre fora da thread da interface para não travar o launcher; falhas mostram o
+  caminho exato da pasta ao usuário; as ações ficam temporariamente desabilitadas para evitar
+  concorrência com `Desinstalar`
 
 ## Posição do minimapa — versão 3.4.17
 
@@ -103,7 +119,7 @@ Nome principal exibido: `cubblemon legacy`.
   desconexões de rede e desconexões após entrar no mundo não iniciam download
 - Um relatório de cada falha detectada é salvo em
   `~/.cobblemon_legacy/logs/launcher-connection-errors/` no Linux ou no equivalente da instância
-  em `%USERPROFILE%` no Windows; tokens conhecidos são ocultados e o arquivo é privado no Linux
+  em `%APPDATA%` no Windows; tokens conhecidos são ocultados e o arquivo é privado no Linux
 - O relatório inclui o trecho do log, servidor, namespaces e nome/versão exigidos quando o erro
   os informa; depois registra o nome e a versão encontrados no Modrinth ou o motivo da falha
 - Versões exatas exigidas pelo erro não são substituídas por versões mais recentes; exigências
@@ -187,6 +203,15 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.18.jar --self-test`: aprovado para criação da
+  pasta da instância em perfil temporário, localização em `%APPDATA%` no Windows e seleção dos
+  comandos Linux/Windows, além dos autotestes anteriores
+- `--backend-probe` do JAR `3.4.18` com perfil temporário isolado: aprovado
+- Manifesto do JAR `3.4.18`: `Implementation-Version: 3.4.18` confirmado
+- SHA-256 local do JAR `3.4.18`:
+  `95a7f5c4fcde358dc26f0d6242ce042ab97e7add9fc87a67908c3c6b2034f65f`
+- Testes de minimapa e desempenho existentes: aprovados; a abertura visual de uma pasta
+  pelo botão ainda não foi testada manualmente no Windows
 - JAR 3.4.17 publicado, baixado novamente e aprovado no autoteste e `--backend-probe` isolado;
   SHA-256 público: `44828a5ff79f614ff39a9d553730175e6e367c506e14c348bbac1a3d9f8a8f12`
 - Manifesto do JAR público: `Implementation-Version: 3.4.17` e classe principal confirmadas

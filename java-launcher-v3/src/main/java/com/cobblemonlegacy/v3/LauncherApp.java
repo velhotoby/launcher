@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.17";
+    private static final String CURRENT_VERSION = "3.4.18";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -52,8 +52,9 @@ public final class LauncherApp extends JFrame {
     private final ModeButton offlineMode = new ModeButton("PERFIL LOCAL");
     private final ModeButton microsoftMode = new ModeButton("CONTA MICROSOFT");
     private final JLabel accountState = label("Nenhuma conta Microsoft conectada.", MUTED, 10, Font.PLAIN);
-    private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", false);
-    private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", true);
+    private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", ButtonStyle.PRIMARY);
+    private final ActionButton openDirectoryButton = new ActionButton("ABRIR DIRETÓRIO", ButtonStyle.SECONDARY);
+    private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", ButtonStyle.DANGER);
     private final JCheckBox rememberMe = new JCheckBox("Lembrar de mim?");
     private final JCheckBox weakPcMode = new JCheckBox("PC Fraco");
     private final LocalNicknameStore localNickname = new LocalNicknameStore(Path.of(
@@ -70,6 +71,7 @@ public final class LauncherApp extends JFrame {
     private volatile boolean busy;
 
     private enum AuthMode { OFFLINE, MICROSOFT }
+    private enum ButtonStyle { PRIMARY, SECONDARY, DANGER }
 
     public static void main(String[] args) {
         if (args.length == 1 && "--backend-probe".equals(args[0])) {
@@ -115,9 +117,9 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.18", "3.4.17")
-                        || UpdateService.isNewer("3.4.17", "3.4.17")
-                        || UpdateService.isNewer("3.4.16", "3.4.17")) {
+                if (!UpdateService.isNewer("3.4.19", "3.4.18")
+                        || UpdateService.isNewer("3.4.18", "3.4.18")
+                        || UpdateService.isNewer("3.4.17", "3.4.18")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 LocalNicknameStore nicknameStore = new LocalNicknameStore(temporary.resolve("nickname.txt"));
@@ -145,9 +147,23 @@ public final class LauncherApp extends JFrame {
                 } catch (CancellationException expected) {
                     // O cancelamento deve terminar antes de qualquer requisição de rede.
                 }
+                Path instance = InstanceDirectoryService.ensureDirectory(temporary, "Linux", null);
+                if (!instance.equals(temporary.resolve(".cobblemon_legacy")) || !Files.isDirectory(instance)) {
+                    throw new IllegalStateException("Falha ao localizar a pasta da instância.");
+                }
+                Path roaming = temporary.resolve("AppData").resolve("Roaming");
+                if (!InstanceDirectoryService.path(temporary, "Windows 11", roaming.toString())
+                        .equals(roaming.resolve(".cobblemon_legacy"))) {
+                    throw new IllegalStateException("Falha ao localizar a instância no AppData do Windows.");
+                }
+                if (!"explorer.exe".equals(InstanceDirectoryService.fallbackCommands(instance, "Windows 11")[0][0])
+                        || !"xdg-open".equals(InstanceDirectoryService.fallbackCommands(instance, "Linux")[0][0])) {
+                    throw new IllegalStateException("Falha nos gerenciadores de arquivos multiplataforma.");
+                }
+                Files.delete(instance);
                 Files.delete(options);
                 Files.delete(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, nickname local e cancelamento Microsoft.");
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, pasta da instância, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -326,9 +342,16 @@ public final class LauncherApp extends JFrame {
         playButton.addActionListener(event -> startGame());
         content.add(playButton);
         content.add(Box.createVerticalStrut(10));
-        uninstallButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel utilityButtons = transparentPanel(new GridLayout(1, 2, 9, 0));
+        utilityButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
+        utilityButtons.setPreferredSize(new Dimension(360, 40));
+        utilityButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        openDirectoryButton.setToolTipText("Abrir a pasta onde ficam mods, configurações e arquivos do Minecraft");
+        openDirectoryButton.addActionListener(event -> openInstanceDirectory());
         uninstallButton.addActionListener(event -> uninstall());
-        content.add(uninstallButton);
+        utilityButtons.add(openDirectoryButton);
+        utilityButtons.add(uninstallButton);
+        content.add(utilityButtons);
         content.add(Box.createVerticalStrut(13));
 
         statusCard.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -337,7 +360,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.17", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.18", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -720,14 +743,40 @@ public final class LauncherApp extends JFrame {
     }
 
     private static Path instancePath() {
-        return Path.of(System.getProperty("user.home"), ".cobblemon_legacy").toAbsolutePath().normalize();
+        return InstanceDirectoryService.path(Path.of(System.getProperty("user.home")));
+    }
+
+    private void openInstanceDirectory() {
+        if (busy) return;
+        setBusy(true);
+        new SwingWorker<Path, Void>() {
+            @Override protected Path doInBackground() throws Exception {
+                Path folder = InstanceDirectoryService.ensureDirectory(Path.of(System.getProperty("user.home")));
+                InstanceDirectoryService.open(folder);
+                return folder;
+            }
+
+            @Override protected void done() {
+                try {
+                    Path folder = get();
+                    statusCard.update("status", "Pasta do Minecraft aberta: " + folder, -1);
+                } catch (Exception error) {
+                    statusCard.update("error", "Não foi possível abrir a pasta do Minecraft.", 0);
+                    JOptionPane.showMessageDialog(LauncherApp.this,
+                            "Pasta: " + instancePath() + "\n\n" + rootMessage(error),
+                            "Abrir diretório", JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    setBusy(false);
+                }
+            }
+        }.execute();
     }
 
     private void uninstall() {
         if (busy) return;
         Path home = Path.of(System.getProperty("user.home")).toAbsolutePath().normalize();
         Path instance = instancePath();
-        if (!home.equals(instance.getParent()) || !".cobblemon_legacy".equals(instance.getFileName().toString())) {
+        if (!InstanceDirectoryService.isExpectedInstance(instance, home)) {
             statusCard.update("error", "O diretório da instância não é seguro para exclusão.", 0);
             return;
         }
@@ -790,6 +839,7 @@ public final class LauncherApp extends JFrame {
         rememberMe.setEnabled(!value && authMode == AuthMode.OFFLINE);
         weakPcMode.setEnabled(!value);
         playButton.setEnabled(!value);
+        openDirectoryButton.setEnabled(!value);
         uninstallButton.setEnabled(!value);
         playButton.setText(value ? "AGUARDE..." : "INICIAR AVENTURA");
     }
@@ -1193,29 +1243,33 @@ public final class LauncherApp extends JFrame {
     }
 
     private static final class ActionButton extends JButton {
-        private final boolean danger;
-        ActionButton(String text, boolean danger) {
+        private final ButtonStyle style;
+        ActionButton(String text, ButtonStyle style) {
             super(text);
-            this.danger = danger;
-            setFont(font(danger ? 10 : 13, Font.BOLD));
-            setForeground(danger ? RED : Color.WHITE);
+            this.style = style;
+            setFont(font(style == ButtonStyle.PRIMARY ? 13 : 10, Font.BOLD));
+            setForeground(style == ButtonStyle.PRIMARY ? Color.WHITE : style == ButtonStyle.DANGER ? RED : INK);
             setBorderPainted(false);
             setContentAreaFilled(false);
             setFocusPainted(false);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setPreferredSize(new Dimension(360, danger ? 40 : 54));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, danger ? 40 : 54));
+            setPreferredSize(new Dimension(360, style == ButtonStyle.PRIMARY ? 54 : 40));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, style == ButtonStyle.PRIMARY ? 54 : 40));
         }
         @Override protected void paintComponent(Graphics original) {
             Graphics2D g = (Graphics2D) original.create();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            if (danger) {
+            if (style != ButtonStyle.PRIMARY) {
                 g.setColor(new Color(27, 40, 61, 45));
                 g.fillRoundRect(0, 3, getWidth(), getHeight() - 3, 18, 18);
-                g.setColor(new Color(255, 255, 255, isEnabled() ? 170 : 90));
+                g.setColor(style == ButtonStyle.DANGER
+                        ? new Color(255, 255, 255, isEnabled() ? 170 : 90)
+                        : new Color(218, 244, 244, isEnabled() ? 230 : 120));
                 g.fillRoundRect(0, 0, getWidth(), getHeight() - 3, 18, 18);
                 g.setStroke(new BasicStroke(1.6f));
-                g.setColor(new Color(201, 49, 36, isEnabled() ? 190 : 70));
+                g.setColor(style == ButtonStyle.DANGER
+                        ? new Color(201, 49, 36, isEnabled() ? 190 : 70)
+                        : new Color(27, 40, 61, isEnabled() ? 190 : 70));
                 g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 4, 18, 18);
             } else {
                 g.setColor(new Color(27, 40, 61, 140));
@@ -1234,7 +1288,8 @@ public final class LauncherApp extends JFrame {
                 g.fill(triangle);
             }
             g.dispose();
-            setForeground(danger ? (isEnabled() ? RED : MUTED) : Color.WHITE);
+            setForeground(style == ButtonStyle.PRIMARY ? Color.WHITE
+                    : isEnabled() ? (style == ButtonStyle.DANGER ? RED : INK) : MUTED);
             super.paintComponent(original);
         }
     }
