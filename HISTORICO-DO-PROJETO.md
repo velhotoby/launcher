@@ -10,13 +10,11 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.15`
-- Tag estável: `v3.4.15`
-- Versão local em teste: `3.4.17`
+- Versão estável publicada: `3.4.17`
+- Tag estável: `v3.4.17`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.15.jar`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.17.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.15`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.17.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.17`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +38,7 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Posição do minimapa — versão 3.4.17 local
+## Posição do minimapa — versão 3.4.17
 
 - A 3.4.16 configurava o minimapa à direita antes de iniciar o Minecraft, mas a limpeza do
   `eml-lib` apagava `config/xaerohud.txt` logo depois; o Xaero o recriava à esquerda
@@ -189,6 +187,13 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR 3.4.17 publicado, baixado novamente e aprovado no autoteste e `--backend-probe` isolado;
+  SHA-256 público: `44828a5ff79f614ff39a9d553730175e6e367c506e14c348bbac1a3d9f8a8f12`
+- Manifesto do JAR público: `Implementation-Version: 3.4.17` e classe principal confirmadas
+- Workflow de publicação `34738150556`: aprovado, incluindo o teste do minimapa e da limpeza
+- Retenção após a publicação: versões `3.4.17`, `3.4.15` e a permanente `3.4.11`; os assets
+  `Cobblemon-Legacy-Launcher-3.4.11.jar` e `Cobblemon-Legacy-Launcher-Installer.exe`
+  permanecem no GitHub
 - `node java-launcher-v3/tools/test-xaero-minimap.js` na 3.4.17: aprovado também contra a
   rotina real de limpeza do `eml-lib`, confirmando que `config/xaerohud.txt` e `xaero/` são
   preservados enquanto um arquivo descartável é removido
