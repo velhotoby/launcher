@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 11 de setembro de 2026.
+Última atualização deste documento: 12 de setembro de 2026.
 
 ## Estado atual
 
@@ -12,8 +12,10 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.13`
 - Tag estável: `v3.4.13`
+- Versão local em teste: `3.4.14`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.13.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.14.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.13`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -51,6 +53,11 @@ Nome principal exibido: `cubblemon legacy`.
 ## Login
 
 - Perfil local disponível
+- Na versão local `3.4.14`, o checkbox `Lembrar de mim?` salva somente o nickname do perfil local
+  em `~/.cobblemon_legacy_launcher/local-nickname.txt` no Linux ou
+  `%USERPROFILE%\.cobblemon_legacy_launcher\local-nickname.txt` no Windows
+- O nickname válido é restaurado na próxima abertura; desmarcar a opção apaga o arquivo local
+- A opção não salva credenciais Microsoft e fica desabilitada no modo de conta Microsoft
 - Login original Microsoft/Minecraft por código de dispositivo
 - O navegador é aberto no fluxo Microsoft quando possível
 - Fechar ou cancelar a janela de código interrompe a autenticação e devolve o controle à tela
@@ -145,6 +152,13 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR local `3.4.14`: autoteste de gravação, restauração, alteração e exclusão do nickname aprovado
+- `java -jar dist/Cobblemon-Legacy-Launcher-3.4.14.jar --self-test`: aprovado
+- `--backend-probe` do JAR `3.4.14` com perfil temporário isolado: aprovado
+- Teste do perfil de desempenho em Node: aprovado
+- Manifesto do JAR `3.4.14`: `Implementation-Version: 3.4.14` confirmado
+- SHA-256 local do JAR `3.4.14`:
+  `ec9703dddbc02f26a5970f5d73597ce5db650966b2b01a616e377c0dbd6c25c6`
 - `java -jar dist/Cobblemon-Legacy-Launcher-3.4.13.jar --self-test`: aprovado
 - `java -Duser.home=/tmp/cobblemon-launcher-3413-test -jar
   dist/Cobblemon-Legacy-Launcher-3.4.13.jar --backend-probe`: aprovado

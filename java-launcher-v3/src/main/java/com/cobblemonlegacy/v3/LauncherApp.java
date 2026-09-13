@@ -2,6 +2,8 @@ package com.cobblemonlegacy.v3;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.13";
+    private static final String CURRENT_VERSION = "3.4.14";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -52,7 +54,10 @@ public final class LauncherApp extends JFrame {
     private final JLabel accountState = label("Nenhuma conta Microsoft conectada.", MUTED, 10, Font.PLAIN);
     private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", false);
     private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", true);
+    private final JCheckBox rememberMe = new JCheckBox("Lembrar de mim?");
     private final JCheckBox weakPcMode = new JCheckBox("PC Fraco");
+    private final LocalNicknameStore localNickname = new LocalNicknameStore(Path.of(
+            System.getProperty("user.home"), ".cobblemon_legacy_launcher", "local-nickname.txt"));
     private final StatusCard statusCard = new StatusCard();
     private final MicrosoftAuthService microsoft = new MicrosoftAuthService();
     private final BackendRuntime backendRuntime = new BackendRuntime();
@@ -107,10 +112,29 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.14", "3.4.13")
-                        || UpdateService.isNewer("3.4.13", "3.4.13")
-                        || UpdateService.isNewer("3.4.12", "3.4.13")) {
+                if (!UpdateService.isNewer("3.4.15", "3.4.14")
+                        || UpdateService.isNewer("3.4.14", "3.4.14")
+                        || UpdateService.isNewer("3.4.13", "3.4.14")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
+                }
+                LocalNicknameStore nicknameStore = new LocalNicknameStore(temporary.resolve("nickname.txt"));
+                nicknameStore.save("Treinador_42");
+                if (!"Treinador_42".equals(nicknameStore.load())) {
+                    throw new IllegalStateException("Falha ao lembrar o nickname local.");
+                }
+                nicknameStore.save("NovoNome");
+                if (!"NovoNome".equals(nicknameStore.load())) {
+                    throw new IllegalStateException("Falha ao atualizar o nickname local.");
+                }
+                nicknameStore.forget();
+                if (nicknameStore.load() != null) {
+                    throw new IllegalStateException("Falha ao esquecer o nickname local.");
+                }
+                try {
+                    nicknameStore.save("nome inválido");
+                    throw new IllegalStateException("Nickname inválido foi salvo.");
+                } catch (IllegalArgumentException expected) {
+                    // Somente nicknames válidos podem ser gravados.
                 }
                 try {
                     new MicrosoftAuthService().signIn((verificationUri, userCode) -> {}, () -> true);
@@ -120,7 +144,7 @@ public final class LauncherApp extends JFrame {
                 }
                 Files.delete(options);
                 Files.delete(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br e cancelamento Microsoft.");
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -254,12 +278,36 @@ public final class LauncherApp extends JFrame {
         username.setCaretColor(GREEN);
         username.setOpaque(false);
         username.setBorder(new EmptyBorder(0, 46, 0, 58));
+        try {
+            String savedNickname = localNickname.load();
+            if (savedNickname != null) {
+                username.setText(savedNickname);
+                rememberMe.setSelected(true);
+            }
+        } catch (IOException error) {
+            statusCard.update("error", "Não foi possível ler o nickname salvo: " + error.getMessage(), 0);
+        }
+        username.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent event) { persistLocalNickname(); }
+            @Override public void removeUpdate(DocumentEvent event) { persistLocalNickname(); }
+            @Override public void changedUpdate(DocumentEvent event) { persistLocalNickname(); }
+        });
         FieldPanel fieldPanel = new FieldPanel(username);
         fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(fieldPanel);
         content.add(Box.createVerticalStrut(8));
+        content.add(label("Apenas letras, números e underscore.", MUTED, 11, Font.PLAIN));
+        content.add(Box.createVerticalStrut(2));
         JPanel profileLine = transparentPanel(new BorderLayout());
-        profileLine.add(label("Apenas letras, números e underscore.", MUTED, 11, Font.PLAIN), BorderLayout.WEST);
+        rememberMe.setOpaque(false);
+        rememberMe.setContentAreaFilled(false);
+        rememberMe.setFocusPainted(false);
+        rememberMe.setForeground(MUTED);
+        rememberMe.setFont(font(10, Font.BOLD));
+        rememberMe.setToolTipText("Salvar apenas o nickname deste perfil local neste computador");
+        rememberMe.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        rememberMe.addActionListener(event -> persistLocalNickname());
+        profileLine.add(rememberMe, BorderLayout.WEST);
         weakPcMode.setOpaque(false);
         weakPcMode.setContentAreaFilled(false);
         weakPcMode.setFocusPainted(false);
@@ -269,7 +317,7 @@ public final class LauncherApp extends JFrame {
         weakPcMode.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         profileLine.add(weakPcMode, BorderLayout.EAST);
         content.add(profileLine);
-        content.add(Box.createVerticalStrut(13));
+        content.add(Box.createVerticalStrut(8));
 
         playButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         playButton.addActionListener(event -> startGame());
@@ -286,7 +334,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.13", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.14", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -376,6 +424,7 @@ public final class LauncherApp extends JFrame {
             username.requestFocusInWindow();
             return;
         }
+        if (authMode == AuthMode.OFFLINE) persistLocalNickname();
 
         setBusy(true);
         statusCard.update("working", "Verificando os componentes do modpack...", 0);
@@ -642,6 +691,7 @@ public final class LauncherApp extends JFrame {
         offlineMode.setSelected(!microsoftSelected);
         microsoftMode.setSelected(microsoftSelected);
         username.setEnabled(!busy && !microsoftSelected);
+        rememberMe.setEnabled(!busy && !microsoftSelected);
         accountState.setForeground(microsoftAccount == null ? MUTED : GREEN);
         accountState.setText(microsoftAccount == null
                 ? (microsoftSelected ? "Clique para conectar sua conta original." : "Você também pode usar uma conta original.")
@@ -734,10 +784,24 @@ public final class LauncherApp extends JFrame {
         username.setEnabled(!value && authMode == AuthMode.OFFLINE);
         offlineMode.setEnabled(!value);
         microsoftMode.setEnabled(!value);
+        rememberMe.setEnabled(!value && authMode == AuthMode.OFFLINE);
         weakPcMode.setEnabled(!value);
         playButton.setEnabled(!value);
         uninstallButton.setEnabled(!value);
         playButton.setText(value ? "AGUARDE..." : "INICIAR AVENTURA");
+    }
+
+    private void persistLocalNickname() {
+        try {
+            String nickname = username.getText().trim();
+            if (rememberMe.isSelected() && USERNAME.matcher(nickname).matches()) {
+                localNickname.save(nickname);
+            } else {
+                localNickname.forget();
+            }
+        } catch (IOException error) {
+            statusCard.update("error", "Não foi possível salvar o nickname local: " + error.getMessage(), 0);
+        }
     }
 
     private static String friendlyError(Exception error) {
