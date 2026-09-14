@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.19";
+    private static final String CURRENT_VERSION = "3.4.20";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -117,11 +117,12 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.20", "3.4.19")
-                        || UpdateService.isNewer("3.4.19", "3.4.19")
-                        || UpdateService.isNewer("3.4.18", "3.4.19")) {
+                if (!UpdateService.isNewer("3.4.21", "3.4.20")
+                        || UpdateService.isNewer("3.4.20", "3.4.20")
+                        || UpdateService.isNewer("3.4.19", "3.4.20")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
+                EventBannerService.selfTest();
                 Rectangle bannerFrame = BannerPanel.centeredBounds(2, 2, 688, 500, 1983, 793);
                 if (bannerFrame.x < 2 || bannerFrame.y < 2 || bannerFrame.x + bannerFrame.width > 690
                         || bannerFrame.y + bannerFrame.height > 502
@@ -170,7 +171,7 @@ public final class LauncherApp extends JFrame {
                 Files.delete(instance);
                 Files.delete(options);
                 Files.delete(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, banner centralizado, pasta da instância, nickname local e cancelamento Microsoft.");
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, eventos, banner centralizado, pasta da instância, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -367,7 +368,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.19", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.20", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -944,7 +945,7 @@ public final class LauncherApp extends JFrame {
             setMinimumSize(new Dimension(560, 610));
             setLayout(new BorderLayout());
             setBorder(new EmptyBorder(3, 3, 9, 9));
-            add(new BannerPanel(), BorderLayout.CENTER);
+            add(new BannerStage(), BorderLayout.CENTER);
 
             JPanel story = new JPanel();
             story.setOpaque(false);
@@ -981,6 +982,196 @@ public final class LauncherApp extends JFrame {
             g.setStroke(new BasicStroke(3));
             g.setColor(INK);
             g.draw(new RoundRectangle2D.Float(1.5f, 1.5f, getWidth() - 11, getHeight() - 12, 26, 26));
+            g.dispose();
+            super.paintComponent(original);
+        }
+    }
+
+    private static final class BannerStage extends JLayeredPane {
+        private final CardLayout pages = new CardLayout();
+        private final JPanel content = transparentPanel(pages);
+        private final JPanel tabs = transparentPanel(new GridLayout(1, 2, 6, 0));
+        private final EventPanel events = new EventPanel();
+
+        BannerStage() {
+            setOpaque(false);
+            content.add(new BannerPanel(), "banner");
+            content.add(events, "events");
+
+            ModeButton bannerTab = new ModeButton("DESTAQUE");
+            ModeButton eventsTab = new ModeButton("EVENTOS");
+            ButtonGroup group = new ButtonGroup();
+            group.add(bannerTab);
+            group.add(eventsTab);
+            bannerTab.setSelected(true);
+            bannerTab.addActionListener(event -> pages.show(content, "banner"));
+            eventsTab.addActionListener(event -> {
+                pages.show(content, "events");
+                events.showEvents();
+            });
+            tabs.add(bannerTab);
+            tabs.add(eventsTab);
+            add(content, Integer.valueOf(0));
+            add(tabs, Integer.valueOf(1));
+        }
+
+        @Override public void doLayout() {
+            content.setBounds(0, 0, getWidth(), getHeight());
+            tabs.setBounds(Math.max(8, getWidth() - 256), 14, 244, 38);
+        }
+    }
+
+    private static final class EventPanel extends JPanel {
+        private final JLabel title = label("Eventos da comunidade", CREAM, 17, Font.BOLD);
+        private final JLabel subtitle = label("Selecione a aba para carregar os banners.", CREAM, 10, Font.PLAIN);
+        private final JLabel source = label("", new Color(193, 223, 225), 9, Font.BOLD);
+        private final JLabel counter = label("0 / 0", CREAM, 10, Font.BOLD);
+        private final JButton previous = navigationButton("‹", "Banner anterior");
+        private final JButton next = navigationButton("›", "Próximo banner");
+        private final JButton refresh = navigationButton("ATUALIZAR", "Atualizar eventos do GitHub");
+        private java.util.List<EventBannerService.Banner> banners = java.util.List.of();
+        private int selected;
+        private boolean loaded;
+        private boolean loading;
+
+        EventPanel() {
+            setOpaque(false);
+            setLayout(new BorderLayout());
+            JPanel footer = transparentPanel(new BorderLayout(12, 0));
+            footer.setBorder(new EmptyBorder(12, 25, 21, 25));
+            footer.setPreferredSize(new Dimension(300, 106));
+            JPanel description = transparentPanel();
+            description.setLayout(new BoxLayout(description, BoxLayout.Y_AXIS));
+            description.add(title);
+            description.add(Box.createVerticalStrut(3));
+            description.add(subtitle);
+            description.add(Box.createVerticalStrut(4));
+            description.add(source);
+            footer.add(description, BorderLayout.CENTER);
+            JPanel controls = transparentPanel(new FlowLayout(FlowLayout.RIGHT, 5, 15));
+            controls.add(previous);
+            controls.add(counter);
+            controls.add(next);
+            controls.add(refresh);
+            footer.add(controls, BorderLayout.EAST);
+            add(footer, BorderLayout.SOUTH);
+            previous.addActionListener(event -> navigate(-1));
+            next.addActionListener(event -> navigate(1));
+            refresh.addActionListener(event -> refresh());
+            updateLabels();
+        }
+
+        private static JButton navigationButton(String text, String tooltip) {
+            JButton button = new JButton(text);
+            button.setFont(font(text.length() > 2 ? 9 : 17, Font.BOLD));
+            button.setForeground(INK);
+            button.setBackground(CREAM);
+            button.setBorder(new EmptyBorder(2, 8, 2, 8));
+            button.setFocusPainted(false);
+            button.setToolTipText(tooltip);
+            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            return button;
+        }
+
+        void showEvents() {
+            if (!loaded && !loading) refresh();
+        }
+
+        private void refresh() {
+            if (loading) return;
+            loading = true;
+            source.setText("Consultando eventos no GitHub...");
+            updateLabels();
+            repaint();
+            new SwingWorker<EventBannerService.Result, Void>() {
+                @Override protected EventBannerService.Result doInBackground() throws Exception {
+                    return EventBannerService.load();
+                }
+
+                @Override protected void done() {
+                    try {
+                        EventBannerService.Result result = get();
+                        banners = result.banners();
+                        selected = 0;
+                        loaded = true;
+                        source.setText(result.online() ? "BANNERS ATUALIZADOS DO GITHUB"
+                                : "BANNER DE TESTE INCLUÍDO NO LAUNCHER");
+                    } catch (Exception error) {
+                        banners = java.util.List.of();
+                        loaded = false;
+                        source.setText("Não foi possível carregar os eventos. Tente atualizar.");
+                    } finally {
+                        loading = false;
+                        updateLabels();
+                        repaint();
+                    }
+                }
+            }.execute();
+        }
+
+        private void navigate(int direction) {
+            if (banners.size() < 2) return;
+            selected = (selected + direction + banners.size()) % banners.size();
+            updateLabels();
+            repaint();
+        }
+
+        private void updateLabels() {
+            if (!banners.isEmpty()) {
+                EventBannerService.Banner banner = banners.get(selected);
+                title.setText(banner.title());
+                subtitle.setText(banner.subtitle());
+            } else {
+                title.setText(loading ? "Carregando eventos..." : "Nenhum evento anunciado");
+                subtitle.setText(loading ? "Aguarde enquanto buscamos os banners da comunidade."
+                        : "Volte em breve para conferir as próximas novidades.");
+            }
+            counter.setText(banners.isEmpty() ? "0 / 0" : (selected + 1) + " / " + banners.size());
+            previous.setEnabled(!loading && banners.size() > 1);
+            next.setEnabled(!loading && banners.size() > 1);
+            refresh.setEnabled(!loading);
+        }
+
+        @Override protected void paintComponent(Graphics original) {
+            Graphics2D g = (Graphics2D) original.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            int areaWidth = Math.max(1, getWidth() - 12);
+            int areaHeight = Math.max(1, getHeight() - 2);
+            Shape clip = new RoundRectangle2D.Float(2, 2, areaWidth, areaHeight, 24, 24);
+            g.setClip(clip);
+            g.setPaint(new GradientPaint(0, 0, new Color(20, 57, 76), getWidth(), getHeight(), new Color(18, 37, 54)));
+            g.fillRect(2, 2, areaWidth, areaHeight);
+            if (!banners.isEmpty()) {
+                BufferedImage image = banners.get(selected).image();
+                double cover = Math.max(areaWidth / (double) image.getWidth(), areaHeight / (double) image.getHeight());
+                int coverWidth = (int) Math.ceil(image.getWidth() * cover);
+                int coverHeight = (int) Math.ceil(image.getHeight() * cover);
+                g.drawImage(image, 2 + (areaWidth - coverWidth) / 2, 2 + (areaHeight - coverHeight) / 2,
+                        coverWidth, coverHeight, null);
+                g.setColor(new Color(11, 27, 43, 175));
+                g.fillRect(2, 2, areaWidth, areaHeight);
+                Rectangle frame = BannerPanel.centeredBounds(14, 62, Math.max(1, getWidth() - 36),
+                        Math.max(1, getHeight() - 184), image.getWidth(), image.getHeight());
+                g.setClip(new RoundRectangle2D.Float(frame.x, frame.y, frame.width, frame.height, 16, 16));
+                g.drawImage(image, frame.x, frame.y, frame.width, frame.height, null);
+                g.setClip(clip);
+                g.setStroke(new BasicStroke(2));
+                g.setColor(new Color(255, 248, 226, 225));
+                g.drawRoundRect(frame.x, frame.y, frame.width - 1, frame.height - 1, 16, 16);
+            } else {
+                String message = loading ? "Carregando banners..." : "Eventos em breve";
+                g.setColor(CREAM);
+                g.setFont(font(19, Font.BOLD));
+                FontMetrics metrics = g.getFontMetrics();
+                g.drawString(message, (getWidth() - metrics.stringWidth(message)) / 2, Math.max(130, getHeight() / 2));
+            }
+            g.setColor(new Color(12, 31, 46, 218));
+            g.fillRoundRect(13, getHeight() - 111, Math.max(1, getWidth() - 36), 99, 20, 20);
+            g.setClip(null);
+            g.setColor(CREAM);
+            g.setFont(font(10, Font.BOLD));
+            g.drawString("AGENDA DA COMUNIDADE", 24, 39);
             g.dispose();
             super.paintComponent(original);
         }

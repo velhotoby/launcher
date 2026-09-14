@@ -55,11 +55,11 @@ cat > "$BUILD_DIR/MANIFEST.MF" <<'EOF'
 Manifest-Version: 1.0
 Main-Class: com.cobblemonlegacy.v3.LauncherApp
 Implementation-Title: Cobblemon Legacy Launcher
-Implementation-Version: 3.4.19
+Implementation-Version: 3.4.20
 Created-By: Cobblemon Legacy Community
 
 EOF
 
-OUTPUT="$DIST_DIR/Cobblemon-Legacy-Launcher-3.4.19.jar"
+OUTPUT="$DIST_DIR/Cobblemon-Legacy-Launcher-3.4.20.jar"
 "$JAR" --create --file "$OUTPUT" --manifest "$BUILD_DIR/MANIFEST.MF" -C "$CLASSES_DIR" .
 echo "$OUTPUT"

@@ -1,8 +1,8 @@
-# Cobblemon Legacy Launcher 3.4.19
+# Cobblemon Legacy Launcher 3.4.20
 
 Versão Java multiplataforma do launcher da comunidade.
 
-O visual 3.4.19 reproduz a identidade do site oficial: banner da comunidade, tipografia
+O visual 3.4.20 reproduz a identidade do site oficial: banner da comunidade, tipografia
 Chakra Petch/Inter, cartões creme com contornos escuros e a paleta vermelho, azul e verde.
 As funções e configurações da versão 3.4.6 foram preservadas.
 O banner panorâmico aparece inteiro e centralizado sobre um fundo escurecido da mesma arte,
@@ -39,7 +39,7 @@ e `sensible-browser`, além de um botão para repetir a abertura ou copiar o end
 
 ## Desempenho automático
 
-A versão 3.4.19 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
+A versão 3.4.20 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
 o Minecraft. Com esses dados, seleciona um perfil econômico, equilibrado ou de alto desempenho e
 define uma quantidade segura de RAM para a JVM (de 2 a 6 GB, conforme o computador).
 
@@ -59,11 +59,25 @@ A versão baixada abre em um processo independente no Linux e no Windows. Depois
 janela inicia, ela valida e exclui somente o JAR anterior do Cobblemon Legacy Launcher; arquivos
 que não correspondam a uma versão válida e mais antiga nunca entram nessa limpeza.
 
-Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.19.jar`.
+Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.20.jar`.
+
+## Eventos
+
+A aba `EVENTOS` ocupa o espaço do banner principal quando selecionada. Ela mostra banners com
+título, descrição, navegação anterior/próximo e botão de atualização. O banner de teste usa a
+arte atual do launcher. Se o GitHub estiver indisponível, o banner de teste incluído no JAR
+continua visível.
+
+O catálogo remoto fica em `java-launcher-v3/src/main/resources/ui/events.json` neste repositório. Para publicar
+um evento futuro sem atualizar o launcher, adicione uma imagem PNG/JPG em
+`java-launcher-v3/src/main/resources/ui/events/`, inclua-a no catálogo com título, descrição e SHA-256, e envie
+os arquivos para a branch `main`. O launcher consulta esse catálogo ao abrir a aba e ao clicar
+em atualizar. Ele aceita somente imagens desse caminho no GitHub, limita tamanho/dimensões e
+confere o SHA-256 antes de exibir.
 
 ## Sincronização de mods
 
-A versão 3.4.19 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
+A versão 3.4.20 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
 baixados apenas de hosts HTTPS aprovados (Modrinth CDN, CurseForge CDN e Maven oficial da FTB),
 sempre com validação de tamanho e SHA-512.
 

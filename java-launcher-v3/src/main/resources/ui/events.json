@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "evento-teste",
+      "title": "Evento de teste",
+      "subtitle": "Em breve, novidades e eventos da comunidade Cobblemon Legacy.",
+      "image": "site-banner.png",
+      "sha256": "55d8158a190721ff354a44a40aac11727a465ce318db3149e88c37b4f420ebc0"
+    }
+  ]
+}

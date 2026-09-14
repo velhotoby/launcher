@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 13 de setembro de 2026.
+Última atualização deste documento: 14 de setembro de 2026.
 
 ## Estado atual
 
@@ -12,8 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.19`
 - Tag estável: `v3.4.19`
+- Versão local em teste: `3.4.20`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.19.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.20.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.19`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -37,6 +38,23 @@ as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Aba Eventos — versão 3.4.20 local
+
+- As abas `DESTAQUE` e `EVENTOS` ficam sobre o banner. Ao selecionar `EVENTOS`, apenas a área
+  do banner é substituída; o painel do launcher e as funções do jogo permanecem iguais
+- Há título, descrição, posição, controles de banner anterior/próximo e botão `ATUALIZAR`
+- O catálogo `java-launcher-v3/src/main/resources/ui/events.json` será lido da branch `main`
+  no GitHub ao abrir a aba ou atualizar; assim, novos eventos poderão aparecer sem novo JAR
+- Imagens remotas são aceitas apenas de `events/*.png|jpg|jpeg` no repositório oficial; nomes,
+  tamanhos, dimensões e SHA-256 são validados antes de exibir. O carregamento não bloqueia a UI
+- O banner de teste reaproveita a arte atual e fica incorporado ao JAR como fallback se o
+  GitHub não responder; até a publicação da 3.4.20, o manifesto remoto ainda não está disponível
+- A janela real foi aberta no Linux e a aba Eventos foi selecionada; o banner, texto e controles
+  apareceram corretamente. O símbolo de atualização inicialmente não estava na fonte e foi
+  substituído pelo texto `ATUALIZAR`, validado na janela reaberta
+- A limpeza automática existente removeu os JARs locais antigos 3.4.19 e 3.4.17 quando a nova
+  versão foi aberta; a release pública da 3.4.19 continua disponível
 
 ## Banner centralizado — versão 3.4.19
 
@@ -211,6 +229,14 @@ SHA-256 do instalador publicado:
 
 ## Validações mais recentes
 
+- JAR `3.4.20` local: compilação, `--self-test` (incluindo manifesto/imagem de eventos) e
+  `--backend-probe` em perfil temporário isolado aprovados
+- Aba Eventos renderizada e aberta na janela real do launcher no Linux; o fallback local
+  apareceu, a interface permaneceu responsiva e o botão `ATUALIZAR` ficou legível
+- Testes de desempenho, diagnóstico, minimapa, reparo de servidor e descoberta de mods: aprovados
+- Manifesto do JAR `3.4.20`: `Implementation-Version: 3.4.20` confirmado
+- SHA-256 local do JAR `3.4.20`:
+  `73db748745030ef6f924506ffe59f4bbcee1e5633f9ac1024ee59f718c013bd5`
 - JAR 3.4.19 publicado, baixado novamente e aprovado no autoteste; SHA-256 público:
   `933038fc64002695609707e989e8cb77215852405fd0e60a3b3521b5b2224aec`
 - Manifesto do JAR público: `Implementation-Version: 3.4.19` e classe principal confirmados
