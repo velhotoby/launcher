@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.19`
-- Tag estável: `v3.4.19`
+- Versão estável publicada: `3.4.21`
+- Tag estável: `v3.4.21`
 - Versão local em teste: `3.4.21`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.21.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.19`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.21`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -68,7 +68,14 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Autotestes de diagnóstico, reparo, descoberta, minimapa, JAR e `--backend-probe`: aprovados
 - SHA-256 local do JAR `3.4.21`:
   `81854c5d3f7d45cf22bb9969621d118a14f204ee5bd58dc404a5f658fd7e5b11`
-- A versão `3.4.21` ainda não foi publicada no GitHub
+- A versão `3.4.21` foi publicada no GitHub pelo workflow `35469794960`; compilação, autotestes,
+  criação da release e retenção foram aprovados
+- JAR público baixado novamente e aprovado em `--self-test` e `--backend-probe`; manifesto com
+  `Implementation-Version: 3.4.21` confirmado
+- SHA-256 do JAR público `3.4.21`:
+  `4c83ed3d992e8526ec6fa397355c19304c0df7707b23897e44903a2ee782418b`
+- Retenção após a publicação: versões rotativas `3.4.21` e `3.4.19`, além da permanente
+  `3.4.11`; o JAR e o instalador permanente da `3.4.11` continuam disponíveis
 
 ## Aba Eventos — versão 3.4.20 local
 
@@ -80,7 +87,7 @@ as releases rotativas que ultrapassarem o limite de duas.
 - Imagens remotas são aceitas apenas de `events/*.png|jpg|jpeg` no repositório oficial; nomes,
   tamanhos, dimensões e SHA-256 são validados antes de exibir. O carregamento não bloqueia a UI
 - O banner de teste reaproveita a arte atual e fica incorporado ao JAR como fallback se o
-  GitHub não responder; até a publicação da 3.4.20, o manifesto remoto ainda não está disponível
+  GitHub não responder; o catálogo remoto foi incluído na `main` com a publicação da 3.4.21
 - A janela real foi aberta no Linux e a aba Eventos foi selecionada; o banner, texto e controles
   apareceram corretamente. O símbolo de atualização inicialmente não estava na fonte e foi
   substituído pelo texto `ATUALIZAR`, validado na janela reaberta
