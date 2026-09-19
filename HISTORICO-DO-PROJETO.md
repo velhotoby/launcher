@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 14 de setembro de 2026.
+Última atualização deste documento: 19 de setembro de 2026.
 
 ## Estado atual
 
@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.19`
 - Tag estável: `v3.4.19`
-- Versão local em teste: `3.4.20`
+- Versão local em teste: `3.4.21`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.20.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.21.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.19`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
@@ -31,13 +31,44 @@ as releases rotativas que ultrapassarem o limite de duas.
 
 - Minecraft `1.21.1`
 - Fabric Loader `0.19.5`
-- Cobblemon `1.7.3`
+- Cobblemon `1.8.1`
 - Pasta da instância: `~/.cobblemon_legacy` no Linux e
   `%APPDATA%\.cobblemon_legacy` no Windows (pasta usada pelo `eml-lib`)
 - Pasta interna do launcher: `~/.cobblemon_legacy_launcher` no Linux e
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Correção da sincronização com o servidor — versão 3.4.21 local
+
+- O erro real de entrada com `1057 entradas de registro` foi reproduzido e corrigido; os
+  namespaces apontados eram `cobblemon`, `cobblemon_picnic`, `cobblesafari`,
+  `mega_showdown` e `supplementaries`
+- O catálogo incorporado continua com 132 mods e foi alinhado ao conjunto atual do servidor:
+  Cobblemon `1.8.1`, Cobblemon Armors `1.6.0+1.8.1`, Picnic `2.4.5`, Trainer Battle
+  `1.11.13+1.8.1`, Raid Dens `0.12.1`, CobbleSafari `0.3.5`, Daycare+ `1.5.0`, Mega
+  Showdown `1.2.0+1.8.1`, Horret's Extended Megas `1.7.8`, Zamega `1.8.1+1.8`, Moonlight
+  `3.6.5` e Supplementaries `3.9.7`
+- O Supplementaries deve permanecer em `3.9.7`: o servidor registra
+  `supplementaries:cooperative_pistons`; a classe de registro existe nessa versão e foi removida
+  das versões `3.9.8` e `3.9.9`
+- O diagnóstico agora conserva até 256 KiB do log, reconhece a mensagem em Português e a forma
+  `missing from local registry`, e ignora o falso namespace XML `log4j`
+- O autorreparo passou a aceitar atualização de um projeto já conhecido somente quando o erro de
+  conexão informa a versão exigida; sem versão explícita, ele não escolhe cegamente a versão mais
+  nova. A substituição local fica vinculada à versão incorporada que substituiu para não sobrepor
+  um catálogo futuro
+- A instância de teste foi sincronizada com os 132 arquivos; versões antigas foram movidas para
+  `.launcher-mods-quarantine-v1`, sem exclusão definitiva
+- Teste real concluído no endereço principal: conexão aceita, dados do servidor sincronizados e
+  `Loaded 518 advancements`; não houve nova tela de registros desconhecidos
+- Permanece um aviso não bloqueante do script CraftTweaker do servidor: `itens_bloqueados.zs`
+  referencia o item removido `mega_showdown:wishing_star_crystal`; a correção pertence ao script
+  administrado pelo servidor, não ao conjunto de mods do cliente
+- Autotestes de diagnóstico, reparo, descoberta, minimapa, JAR e `--backend-probe`: aprovados
+- SHA-256 local do JAR `3.4.21`:
+  `81854c5d3f7d45cf22bb9969621d118a14f204ee5bd58dc404a5f658fd7e5b11`
+- A versão `3.4.21` ainda não foi publicada no GitHub
 
 ## Aba Eventos — versão 3.4.20 local
 

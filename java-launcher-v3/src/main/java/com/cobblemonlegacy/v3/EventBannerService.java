@@ -115,7 +115,7 @@ final class EventBannerService {
     private static byte[] fetch(String path, int limit) throws IOException {
         HttpRequest request = HttpRequest.newBuilder(URI.create(REMOTE_ROOT + path))
                 .timeout(Duration.ofSeconds(12))
-                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.20")
+                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.21")
                 .header("Cache-Control", "no-cache")
                 .GET().build();
         try {

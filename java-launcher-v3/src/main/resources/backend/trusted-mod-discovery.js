@@ -6,7 +6,7 @@ const { downloadMod, validateCatalog, validateFilename } = require('./trusted-mo
 
 const MODRINTH_API = 'https://api.modrinth.com/v2';
 const DISCOVERED_FILENAME = '.launcher-discovered-mods-v1.json';
-const USER_AGENT = 'CobblemonLegacyLauncher/3.4.20';
+const USER_AGENT = 'CobblemonLegacyLauncher/3.4.21';
 
 async function apiJson(url) {
   const parsed = new URL(url);
@@ -155,12 +155,33 @@ async function discoverMissingMods(requirements, namespaces, gamePath, configura
   const discovered = await loadDiscovered(gamePath);
   const mods = [...discovered];
   const knownProjects = new Set([...embedded.mods, ...mods].map((mod) => mod.projectId).filter(Boolean));
+  const knownByProject = new Map([...embedded.mods, ...mods]
+    .filter((mod) => mod.projectId).map((mod) => [mod.projectId, mod]));
   const knownFiles = new Set([...embedded.mods, ...mods].map((mod) => mod.filename));
   const temporaryDirectory = path.join(gamePath, '.launcher-mod-discovery-v1');
   await fsp.rm(temporaryDirectory, { recursive: true, force: true });
   await fsp.mkdir(temporaryDirectory, { recursive: true });
   const resolvedNamespaces = [];
   const resolved = [];
+  let changedCount = 0;
+
+  function storeDiscovered(mod, previous) {
+    const stored = previous ? {
+      ...mod,
+      // This prevents a locally discovered update from overriding a newer
+      // catalog embedded in a future launcher release.
+      replacesVersionId: previous.replacesVersionId || previous.versionId
+    } : mod;
+    const index = mods.findIndex((item) => item.projectId && item.projectId === stored.projectId);
+    if (index >= 0) mods[index] = stored;
+    else mods.push(stored);
+    if (previous?.filename) knownFiles.delete(previous.filename);
+    knownFiles.add(stored.filename);
+    knownProjects.add(stored.projectId);
+    knownByProject.set(stored.projectId, stored);
+    changedCount += 1;
+    return stored;
+  }
 
   async function addDependencies(version, seen = new Set()) {
     for (const dependency of version.dependencies || []) {
@@ -187,15 +208,17 @@ async function discoverMissingMods(requirements, namespaces, gamePath, configura
         (requirement.requiredVersion ? ` ${requirement.requiredVersion}` : '') + ' no Modrinth...' });
       let matched = false;
       for (const project of await candidatesFor(namespace)) {
-        if (knownProjects.has(project.id)) {
-          notify({ type: 'status', message: `${namespace} já consta no modpack; confira a versão no manifesto do servidor.` });
+        const previous = knownByProject.get(project.id);
+        if (previous && !requirement.requiredVersion) {
+          notify({ type: 'status', message: `${namespace} já consta no modpack; o servidor não informou a versão exigida.` });
           continue;
         }
         const versions = (await compatibleVersions(project.id)).filter((version) =>
-          versionMatches(version.version_number, requirement));
+          versionMatches(version.version_number, requirement)
+          && (requirement.requiredVersion || version.version_type === 'release'));
         for (const version of versions.slice(0, 4)) {
           const mod = descriptor(project, version);
-          if (!mod || knownFiles.has(mod.filename)) continue;
+          if (!mod || mod.versionId === previous?.versionId || (!previous && knownFiles.has(mod.filename))) continue;
           const probe = path.join(temporaryDirectory, mod.filename);
           let ids;
           try {
@@ -208,20 +231,21 @@ async function discoverMissingMods(requirements, namespaces, gamePath, configura
           await fsp.rm(probe, { force: true });
           if (!ids.includes(namespace)) continue;
 
-          mods.push(mod);
-          knownProjects.add(mod.projectId);
-          knownFiles.add(mod.filename);
+          storeDiscovered(mod, previous);
           resolvedNamespaces.push(namespace);
           resolved.push({
             id: namespace,
             name: mod.name,
             versionNumber: mod.versionNumber,
             requiredVersion: requirement.requiredVersion,
-            source: mod.source
+            source: mod.source,
+            action: previous ? 'updated' : 'added'
           });
           await addDependencies(version);
           matched = true;
-          notify({ type: 'status', message: `${namespace} identificado com segurança como ${mod.name} ${mod.versionNumber}.` });
+          notify({ type: 'status', message: previous
+            ? `${namespace} atualizado com segurança para ${mod.name} ${mod.versionNumber}.`
+            : `${namespace} identificado com segurança como ${mod.name} ${mod.versionNumber}.` });
           break;
         }
         if (matched) break;
@@ -231,7 +255,7 @@ async function discoverMissingMods(requirements, namespaces, gamePath, configura
       }
     }
 
-    if (mods.length > discovered.length) {
+    if (changedCount > 0) {
       const catalog = validateCatalog({
         schemaVersion: 1,
         packId: 'cobblemon-legacy',
@@ -244,7 +268,7 @@ async function discoverMissingMods(requirements, namespaces, gamePath, configura
       await fsp.writeFile(`${destination}.tmp`, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
       await fsp.rename(`${destination}.tmp`, destination);
     }
-    return { addedCount: mods.length - discovered.length, namespaces: resolvedNamespaces, resolved };
+    return { addedCount: changedCount, changedCount, namespaces: resolvedNamespaces, resolved };
   } finally {
     await fsp.rm(temporaryDirectory, { recursive: true, force: true });
   }

@@ -3,11 +3,16 @@ const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const MAX_LOG_CHARS = 64 * 1024;
+// Registry sync failures can contain more than one thousand lines. Keep enough
+// context to retain the first affected namespaces and the final disconnect reason.
+const MAX_LOG_CHARS = 256 * 1024;
 const MOD_MISMATCH_PATTERNS = [
   /mismatched mod set/i,
   /registry entr(?:y|ies).*unknown/i,
   /unknown.*registry entr(?:y|ies)/i,
+  /registry entr(?:y|ies).*missing from local registry/i,
+  /entradas? de registro.*desconhecid/i,
+  /incompatibilidade entre os mods do cliente e servidor/i,
   /incompatible mod set/i,
   /mod resolution encountered an incompatible/i,
   /missing required mods?/i,
@@ -25,7 +30,7 @@ const CONNECTION_FAILURE_PATTERNS = [
 ];
 const IGNORED_NAMESPACES = new Set([
   'and', 'authlib', 'brigadier', 'c', 'client', 'com', 'fabric', 'forge', 'http',
-  'https', 'fabricloader', 'java', 'minecraft', 'more', 'net', 'neoforge', 'org', 'registry', 'server', 'the'
+  'https', 'fabricloader', 'java', 'log4j', 'minecraft', 'more', 'net', 'neoforge', 'org', 'registry', 'server', 'the'
 ]);
 
 function mismatchReason(text) {
@@ -65,7 +70,7 @@ function extractNamespaces(text) {
     }
   };
   for (const match of text.matchAll(/\b([a-z][a-z0-9_-]{1,63}):[a-z0-9_./-]+\b/gi)) add(match[1]);
-  const marker = text.search(/namespaces? (?:may be )?related/i);
+  const marker = text.search(/(?:namespaces? (?:may be )?related|namespaces? de entrada do registro podem estar relacionados)/i);
   if (marker >= 0) {
     for (const line of text.slice(marker).split(/\r?\n/).slice(1, 24)) {
       const cleaned = line.replace(/\[[^\]]+\]/g, ' ').replace(/[^a-z0-9_-]+/gi, ' ').trim();
@@ -171,6 +176,17 @@ async function selfTest() {
     + 'The following registry entry namespaces may be related:\n\ncobblemonalphas\nfallingtrees\n');
   if (!registry.canRepair || !registry.namespaces.includes('cobblemonalphas')) {
     throw new Error('Falha ao extrair namespaces do erro de registro.');
+  }
+  const portugueseRegistry = analyzeConnectionFailure(
+    '<log4j:Event logger="net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl">\n'
+    + 'Registry entry (cobblesafari:hyperspace_crate) is missing from local registry (minecraft:block)\n'
+    + '1057 entradas de registro recebidas desconhecidas pelo cliente. A causa é uma incompatibilidade entre os mods do cliente e servidor.\n'
+    + 'Os seguintes namespaces de entrada do registro podem estar relacionados:\n\n'
+    + 'cobblemon\ncobblemon_picnic\ncobblesafari\nmega_showdown\nsupplementaries\n');
+  if (!portugueseRegistry.canRepair || !portugueseRegistry.namespaces.includes('cobblemon_picnic')
+      || !portugueseRegistry.namespaces.includes('cobblesafari')
+      || portugueseRegistry.namespaces.includes('log4j')) {
+    throw new Error('Falha ao extrair namespaces do erro de registro em Português.');
   }
   const missing = analyzeConnectionFailure("Missing required mod 'Example Mod' (example_mod) version 1.2.3\n"
     + 'Required mods: second_mod@>=2.0.0');

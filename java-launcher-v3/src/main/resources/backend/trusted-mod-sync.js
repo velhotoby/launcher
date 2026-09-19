@@ -83,7 +83,7 @@ async function downloadMod(mod, destination, onProgress) {
     try {
       assertTrustedDownload(rawUrl, mod.filename);
       const response = await fetch(rawUrl, {
-        redirect: 'follow', headers: { 'User-Agent': 'CobblemonLegacyLauncher/3.4.20' }
+        redirect: 'follow', headers: { 'User-Agent': 'CobblemonLegacyLauncher/3.4.21' }
       });
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
       assertTrustedDownload(response.url, mod.filename);
@@ -126,7 +126,7 @@ async function loadCatalog(configuration, notify, gamePath) {
   }
   notify({ type: 'status', message: 'Procurando atualizações do modpack no servidor...' });
   const response = await fetch(remoteUrl, { headers: {
-    'User-Agent': 'CobblemonLegacyLauncher/3.4.20',
+    'User-Agent': 'CobblemonLegacyLauncher/3.4.21',
     'Cache-Control': 'no-cache'
   } });
   if (!response.ok) throw new Error(`O manifesto remoto respondeu HTTP ${response.status}.`);
@@ -146,12 +146,25 @@ async function mergeDiscovered(catalog, gamePath, notify) {
     if (error.code === 'ENOENT') return catalog;
     throw new Error(`Catálogo local de mods descobertos inválido: ${error.message}`);
   }
-  const projectIds = new Set(catalog.mods.map((mod) => mod.projectId).filter(Boolean));
-  const filenames = new Set(catalog.mods.map((mod) => mod.filename));
-  const additions = local.mods.filter((mod) => !projectIds.has(mod.projectId) && !filenames.has(mod.filename));
-  if (additions.length === 0) return catalog;
-  notify({ type: 'status', message: `${additions.length} mod(s) descoberto(s) pelo autorreparo.` });
-  return validateCatalog({ ...catalog, mods: [...catalog.mods, ...additions] });
+  const mods = [...catalog.mods];
+  let additions = 0;
+  let updates = 0;
+  for (const mod of local.mods) {
+    const index = mod.projectId ? mods.findIndex((item) => item.projectId === mod.projectId) : -1;
+    if (index >= 0) {
+      if (mods[index].versionId === mod.versionId) continue;
+      if (!mod.replacesVersionId || mods[index].versionId !== mod.replacesVersionId) continue;
+      mods[index] = mod;
+      updates += 1;
+      continue;
+    }
+    if (mods.some((item) => item.filename === mod.filename)) continue;
+    mods.push(mod);
+    additions += 1;
+  }
+  if (additions + updates === 0) return catalog;
+  notify({ type: 'status', message: `${additions} mod(s) novo(s) e ${updates} atualização(ões) descobertos pelo autorreparo.` });
+  return validateCatalog({ ...catalog, mods });
 }
 
 async function quarantineUnexpected(modsPath, expectedNames, gamePath, notify) {
