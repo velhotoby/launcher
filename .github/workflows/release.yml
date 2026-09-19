@@ -61,9 +61,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          PROTECTED_RELEASE="v3.4.11"
+          PROTECTED_RELEASE="v3.4.21"
           PROTECTED_ASSETS=(
-            "Cobblemon-Legacy-Launcher-3.4.11.jar"
+            "Cobblemon-Legacy-Launcher-3.4.21.jar"
             "Cobblemon-Legacy-Launcher-Installer.exe"
           )
 
@@ -81,7 +81,7 @@ jobs:
           mapfile -t OLD_RELEASES < <(
             gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
               --json tagName,publishedAt \
-              --jq 'map(select(.tagName != "v3.4.11")) | sort_by(.publishedAt) | reverse | .[2:] | .[].tagName'
+              --jq 'map(select(.tagName != "v3.4.21")) | sort_by(.publishedAt) | reverse | .[2:] | .[].tagName'
           )
           for TAG in "${OLD_RELEASES[@]}"; do
             gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes

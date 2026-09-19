@@ -4,7 +4,7 @@ Launcher oficial multiplataforma da comunidade Cobblemon Legacy.
 
 ## Download
 
-No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.11/Cobblemon-Legacy-Launcher-Installer.exe):
+No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.21/Cobblemon-Legacy-Launcher-Installer.exe):
 ele baixa e valida automaticamente o JAR estável mais recente, instala o Java 21 e cria
 atalhos na Área de Trabalho, menu Iniciar e barra de tarefas.
 
@@ -13,7 +13,7 @@ O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado au
 
 ## Recursos
 
-- Minecraft 1.21.1, Fabric 0.19.5 e Cobblemon 1.7.3
+- Minecraft 1.21.1, Fabric 0.19.5 e Cobblemon 1.8.1
 - login local e conta original Microsoft/Minecraft
 - sincronização e reparo automático do modpack por fontes confiáveis
 - diagnóstico salvo quando falha a entrada no servidor; mods novos só são descobertos após erro de mod verificável

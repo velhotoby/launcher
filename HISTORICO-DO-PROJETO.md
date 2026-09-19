@@ -17,15 +17,16 @@ mudança relevante for concluída, testada ou publicada.
 - JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.21.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.21`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
-- Política de retenção pública: a release/tag `v3.4.11` é permanente porque seus links estão no
+- Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
   limpeza estão automatizadas em `.github/workflows/release.yml`
 
 Em 11 de setembro de 2026, as releases e tags `v3.4.8` e `v3.4.9` foram removidas do GitHub.
-Permaneceram publicadas somente `v3.4.10` e `v3.4.11`. A `v3.4.11` e os assets
-`Cobblemon-Legacy-Launcher-3.4.11.jar` e `Cobblemon-Legacy-Launcher-Installer.exe` nunca entram
-na limpeza. Ao publicar novas versões, o workflow preserva esses links e exclui automaticamente
-as releases rotativas que ultrapassarem o limite de duas.
+Em 19 de setembro de 2026, a proteção permanente foi migrada da `v3.4.11` para a `v3.4.21`;
+o instalador genérico foi preservado na nova release e a antiga foi removida. A `v3.4.21` e os
+assets `Cobblemon-Legacy-Launcher-3.4.21.jar` e `Cobblemon-Legacy-Launcher-Installer.exe` nunca
+entram na limpeza. Ao publicar novas versões, o workflow preserva esses links e exclui
+automaticamente as releases rotativas que ultrapassarem o limite de duas.
 
 ## Configuração do jogo
 
@@ -74,8 +75,8 @@ as releases rotativas que ultrapassarem o limite de duas.
   `Implementation-Version: 3.4.21` confirmado
 - SHA-256 do JAR público `3.4.21`:
   `4c83ed3d992e8526ec6fa397355c19304c0df7707b23897e44903a2ee782418b`
-- Retenção após a publicação: versões rotativas `3.4.21` e `3.4.19`, além da permanente
-  `3.4.11`; o JAR e o instalador permanente da `3.4.11` continuam disponíveis
+- A `3.4.21` passou a ser a versão permanente; o instalador genérico foi copiado para essa release
+  e a `3.4.11` foi removida. A `3.4.19` permanece como versão rotativa
 
 ## Aba Eventos — versão 3.4.20 local
 
@@ -248,7 +249,7 @@ Nome principal exibido: `cubblemon legacy`.
 ## Instalador online para Windows
 
 - Arquivo público:
-  `https://github.com/velhotoby/launcher/releases/download/v3.4.11/Cobblemon-Legacy-Launcher-Installer.exe`
+  `https://github.com/velhotoby/launcher/releases/download/v3.4.21/Cobblemon-Legacy-Launcher-Installer.exe`
 - Construído com Inno Setup e o design atual do launcher
 - Sempre consulta `releases/latest` durante a instalação
 - Baixa o JAR correspondente diretamente do GitHub
