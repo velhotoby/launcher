@@ -4,6 +4,13 @@ const yauzl = require('yauzl');
 
 const PACK_DIRECTORY = 'Cobblemon Legacy Compat';
 const PACK_ID = `file/${PACK_DIRECTORY}`;
+const REQUIRED_RESOURCE_PACK_IDS = [
+  'fabric',
+  'cobblemon:regionbiasforms',
+  'cobblemon:gyaradosjump',
+  '$polymer-resources',
+  'moonlight:merged_pack'
+];
 // São pacotes internos sempre ativados pelo Fabric. Mantê-los na lista de incompatíveis do
 // options.txt faz o Minecraft emitir "Removed resource pack" em toda abertura, embora os mods
 // os carreguem novamente logo depois.
@@ -147,6 +154,9 @@ function updateOptions(content) {
       catch { packs = ['fabric']; }
       if (!Array.isArray(packs)) packs = ['fabric'];
       packs = packs.filter((item) => item !== PACK_ID);
+      for (const required of REQUIRED_RESOURCE_PACK_IDS) {
+        if (!packs.includes(required)) packs.push(required);
+      }
       packs.push(PACK_ID);
       return `resourcePacks:${JSON.stringify(packs)}`;
     }
@@ -161,7 +171,8 @@ function updateOptions(content) {
     }
     return line;
   });
-  if (!resourcePacksFound) updated.push(`resourcePacks:${JSON.stringify(['fabric', PACK_ID])}`);
+  if (!resourcePacksFound) updated.push(
+    `resourcePacks:${JSON.stringify([...REQUIRED_RESOURCE_PACK_IDS, PACK_ID])}`);
   if (!incompatibleFound) updated.push('incompatibleResourcePacks:[]');
   return `${updated.join(newline)}${newline}`;
 }
@@ -196,4 +207,10 @@ async function ensureCompatibilityPack(instanceRoot) {
   return { changed: changedCount > 0, changedCount, packRoot, packId: PACK_ID };
 }
 
-module.exports = { PACK_DIRECTORY, PACK_ID, ensureCompatibilityPack, updateOptions };
+module.exports = {
+  PACK_DIRECTORY,
+  PACK_ID,
+  REQUIRED_RESOURCE_PACK_IDS,
+  ensureCompatibilityPack,
+  updateOptions
+};

@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.23`
 - Tag estável: `v3.4.23`
-- Versão local em teste: `3.4.24`
+- Versão local em teste: `3.4.25`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.24.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.25.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,22 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Resource packs integrados ativados — versão 3.4.25 local
+
+- O launcher agora garante em toda inicialização, inclusive sem `options.txt`, que estes pacotes
+  internos estejam selecionados: `fabric`, `cobblemon:regionbiasforms`,
+  `cobblemon:gyaradosjump`, `$polymer-resources` e `moonlight:merged_pack`
+- Na interface do Minecraft eles correspondem a Mods do Fabric, Region Bias Forms, Gyarados
+  Jump Patterns, Polymer Resources e Recursos Dinâmicos do Moonlight
+- Pacotes já escolhidos pelo jogador são preservados e não há duplicação. O pacote local
+  `file/Cobblemon Legacy Compat` continua no final da lista, com prioridade máxima
+- O autoteste cobre perfil novo, perfil existente, os cinco IDs obrigatórios, ordem do pacote de
+  compatibilidade e idempotência. Autotestes do JAR, desempenho, diagnóstico, minimapa e
+  descoberta de mods também foram aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.25.jar`
+- SHA-256 local: `09c22c06c9ac172bf2b3640a96e64e677c6450e990dca219190cbebbca292e43`
+- A versão 3.4.25 ainda não foi publicada no GitHub
 
 ## Compatibilidade dos recursos dos mods — versão 3.4.24 local
 

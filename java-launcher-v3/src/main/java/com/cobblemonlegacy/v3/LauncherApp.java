@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.24";
+    private static final String CURRENT_VERSION = "3.4.25";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -369,7 +369,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.24", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.25", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();

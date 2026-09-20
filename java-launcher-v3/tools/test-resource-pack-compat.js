@@ -5,6 +5,7 @@ const path = require('node:path');
 const {
   PACK_DIRECTORY,
   PACK_ID,
+  REQUIRED_RESOURCE_PACK_IDS,
   ensureCompatibilityPack,
   updateOptions
 } = require('../src/main/resources/backend/resource-pack-compat');
@@ -20,6 +21,12 @@ assert.match(updated, /incompatibleResourcePacks:\["file\/Meu Pack Antigo"\]/);
 assert.doesNotMatch(updated, /appleskin/);
 assert.equal((updated.match(new RegExp(PACK_DIRECTORY, 'g')) || []).length, 1,
   'O pacote deve aparecer uma única vez nas opções.');
+const selected = JSON.parse(updated.split('\n').find((line) => line.startsWith('resourcePacks:'))
+  .slice('resourcePacks:'.length));
+for (const required of REQUIRED_RESOURCE_PACK_IDS) {
+  assert.ok(selected.includes(required), `${required} deve vir ativado.`);
+}
+assert.equal(selected.at(-1), PACK_ID, 'O pacote de compatibilidade deve ter prioridade máxima.');
 assert.equal(updateOptions(updated), updated, 'A atualização das opções deve ser idempotente.');
 
 const instance = fs.mkdtempSync(path.join(os.tmpdir(), 'cobblemon-resource-pack-test-'));
@@ -34,6 +41,9 @@ const instance = fs.mkdtempSync(path.join(os.tmpdir(), 'cobblemon-resource-pack-
       'assets/minecraft/models/track_arrow.json'), 'utf8')).parent, 'minecraft:item/generated');
     assert.match(fs.readFileSync(path.join(instance, 'options.txt'), 'utf8'),
       new RegExp(`resourcePacks:.*${PACK_DIRECTORY}`));
+    const installed = JSON.parse(fs.readFileSync(path.join(instance, 'options.txt'), 'utf8')
+      .split('\n').find((line) => line.startsWith('resourcePacks:')).slice('resourcePacks:'.length));
+    assert.deepEqual(installed.slice(-6), [...REQUIRED_RESOURCE_PACK_IDS, PACK_ID]);
     const second = await ensureCompatibilityPack(instance);
     assert.equal(second.changed, false, 'A segunda execução não deve regravar arquivos corretos.');
     console.log('RESOURCE PACK COMPAT OK: formato 34, ativação, escrita atômica e idempotência.');
