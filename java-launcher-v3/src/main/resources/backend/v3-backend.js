@@ -12,6 +12,7 @@ const { ensureBundledMinecraftFiles } = require('./minecraft-fallback');
 const { applyDefaultKeybinds } = require('./keybinds');
 const { applyPerformanceProfile, detectPerformanceProfile } = require('./performance-profile');
 const { ensureMinimapOnRight } = require('./xaero-minimap');
+const { ensureCompatibilityPack } = require('./resource-pack-compat');
 const IGNORED_PATHS = require('./preserved-paths');
 
 const INSTANCE_ID = 'cobblemon-legacy';
@@ -124,6 +125,10 @@ async function main() {
     emit('status', `Conexão instável com ${hostname}. Tentando novamente (${attempt}/${totalAttempts})...`);
   });
   await syncTrustedMods(launcher.config.root, config.trustedSync, report);
+  const resourcePack = await ensureCompatibilityPack(launcher.config.root);
+  emit('status', resourcePack.changed
+    ? `${resourcePack.changedCount} correção(ões) de recursos aplicada(s).`
+    : 'Recursos dos mods verificados e compatíveis.');
   let addedServers = 0;
   for (const configuredServer of configuredServers) {
     const result = await ensureServer(launcher.config.root, configuredServer);

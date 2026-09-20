@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.23";
+    private static final String CURRENT_VERSION = "3.4.24";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -82,8 +82,9 @@ public final class LauncherApp extends JFrame {
                                 "const p=require('./performance-profile');" +
                                 "const d=require('./server-error-diagnostics');" +
                                 "const m=require('./xaero-minimap');" +
+                                "const r=require('./resource-pack-compat');" +
                                 "const i=require('./preserved-paths');" +
-                                "if(!e.Launcher||!n||!p.detectPerformanceProfile||!d.analyzeConnectionFailure||!m.ensureMinimapOnRight||!i.includes('config/'))process.exit(2)")
+                                "if(!e.Launcher||!n||!p.detectPerformanceProfile||!d.analyzeConnectionFailure||!m.ensureMinimapOnRight||!r.ensureCompatibilityPack||!i.includes('config/'))process.exit(2)")
                         .directory(prepared.backend().getParent().toFile()).inheritIO().start();
                 if (probe.waitFor() != 0) throw new IllegalStateException("Dependências internas indisponíveis.");
                 System.out.println("BACKEND-PROBE OK: núcleo incorporado e Node disponíveis.");
@@ -368,7 +369,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.23", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.24", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();

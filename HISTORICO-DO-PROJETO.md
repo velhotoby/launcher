@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.23`
 - Tag estável: `v3.4.23`
-- Versão local em teste: `3.4.23`
+- Versão local em teste: `3.4.24`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.23.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.24.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,36 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Compatibilidade dos recursos dos mods — versão 3.4.24 local
+
+- Os 129 JARs ativos e os recursos carregados pelo Minecraft foram auditados; não havia
+  resource pack externo instalado nem falha fatal de recarregamento, mas foram encontrados
+  JSONs inválidos, referências incorretas de modelos/texturas e 24 referências antigas no
+  `options.txt`
+- As versões oficiais mais recentes compatíveis com Fabric 1.21.1 foram consultadas no Modrinth.
+  Elas não corrigiam o conjunto de defeitos encontrado ou poderiam mudar o mod exigido pelo
+  servidor; por isso nenhum JAR verificado foi adulterado ou trocado apenas no cliente
+- O launcher agora cria e ativa, antes de abrir o jogo, o resource pack local
+  `resourcepacks/Cobblemon Legacy Compat`, formato 34 e prioridade máxima
+- A camada corrige os quatro diálogos JSON do KantoNPCs, os JSONs coreanos inválidos do Macaw's
+  Trapdoors e Mega Showdown, o parent ausente do modelo `track_arrow` do CobbleNav, as texturas
+  do item de tenda e da pelúcia shiny do Pokeblocks e quatro referências de cartas com nomes
+  divergentes no Cobble Card Quest
+- O launcher remove somente as 24 referências obsoletas de pacotes internos da lista
+  `incompatibleResourcePacks`; pacotes externos do jogador são preservados. A instância local
+  ficou com `incompatibleResourcePacks:[]` e o pacote de compatibilidade ativado
+- Avisos internos inofensivos que pertencem aos JARs oficiais — arquivos de documentação com
+  nomes inválidos, blockstates de renderização dinâmica, shaders e um card sem arte fornecida
+  pelo autor — não são tratados alterando JARs ou inventando recursos, para preservar a
+  verificação SHA-512 e a compatibilidade com o servidor
+- Teste com cópias reais dos seis mods: 15 arquivos gerados, todos os JSONs válidos e segunda
+  execução idempotente. Autotestes de resource pack, desempenho, diagnóstico, minimapa,
+  descoberta de mods, JAR e `--backend-probe`: aprovados; o teste de reparo com subprocesso
+  também foi aprovado fora do sandbox
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.24.jar`
+- SHA-256 local: `65b6b5fb5c62cb289e327aaa37e2eb4e4984d056cdc2f80c9f8d0fcb70054cae`
+- A versão 3.4.24 ainda não foi publicada no GitHub
 
 ## Remoção dos dois Cobblemon Alphas — versão 3.4.23 local
 
