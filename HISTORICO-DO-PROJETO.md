@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.22`
 - Tag estável: `v3.4.22`
-- Versão local em teste: `3.4.22`
+- Versão local em teste: `3.4.23`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.22.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.23.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.22`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,25 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Remoção dos dois Cobblemon Alphas — versão 3.4.23 local
+
+- Foram retirados do catálogo confiável o `CobblemonAlphas 1.4.1`, ID Fabric
+  `cobblemonalphas`, e o `Cobblemon Alphas 2.2`, ID Fabric `mr_cobblemon_alphas`
+- Os projetos Modrinth `QnWyhFGf` e `3dnjbPgt` e os arquivos
+  `cobblemonalphas-1.4.1.jar` e `cobblemon-alphas-2.2.jar` não fazem mais parte do pacote; o
+  catálogo passou de 131 para 129 mods
+- A inspeção dos metadados `fabric.mod.json` dos mods ativos confirmou que nenhum outro mod
+  declara dependência dessas duas IDs
+- A instância local foi sincronizada com os 129 arquivos exatos do catálogo. Os dois JARs
+  removidos foram movidos para `.launcher-mods-quarantine-v1` e não permanecem em `mods/`
+- Teste real aprovado no servidor principal: conexão aceita, mundo carregado e 619 avanços
+  sincronizados, sem tela de registros incompatíveis e sem os dois mods carregados
+- Autotestes de diagnóstico, descoberta, reparo, minimapa, desempenho, JAR e `--backend-probe`:
+  aprovados; os 129 arquivos locais também foram validados por nome, tamanho e SHA-512
+- SHA-256 local do JAR `3.4.23`:
+  `a6174462bc16cdb940dc368cee1b8130cd67000da63411bd84fc3161ea650e91`
+- A versão `3.4.23` é somente local para teste e ainda não foi publicada no GitHub
 
 ## Remoção do CobblemonRIzeTweaks — versão 3.4.22 local
 

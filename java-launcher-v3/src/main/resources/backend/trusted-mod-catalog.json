@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "cobblemon-legacy",
-  "packVersion": "2026.09.20",
+  "packVersion": "2026.09.20.1",
   "minecraft": "1.21.1",
   "loader": "fabric",
   "mods": [
@@ -591,19 +591,6 @@
       "size": 1148291
     },
     {
-      "name": "Forged in Fabric",
-      "source": "modrinth",
-      "projectId": "3dnjbPgt",
-      "versionId": "h4lYCmLn",
-      "versionNumber": "2.2+mod",
-      "filename": "cobblemon-alphas-2.2.jar",
-      "urls": [
-        "https://cdn.modrinth.com/data/3dnjbPgt/versions/h4lYCmLn/cobblemon-alphas-2.2.jar"
-      ],
-      "sha512": "5908f470fec9713c276074e1293b25bb5e7da27f1cc6e1747afc43eacb740367295e17e9b20135eea35c1788489260368e4d92b429560ed23b99ddcb5e83cef5",
-      "size": 919007
-    },
-    {
       "name": "Cobblemon Armors 1.6.0+1.8.1",
       "source": "modrinth",
       "projectId": "WwDbGW1s",
@@ -706,19 +693,6 @@
       ],
       "sha512": "83f0cd406c1c42911290a566b83b3bf6db60675b893106603cd0c3a52c3bbcd78223965d79ff3900020da264a90c91eec423d039c708f3762f0fb6a6817be05b",
       "size": 1497631
-    },
-    {
-      "name": "Cobblemon Alpha Project 1.4.1",
-      "source": "modrinth",
-      "projectId": "QnWyhFGf",
-      "versionId": "wVSPSTdd",
-      "versionNumber": "1.4.1",
-      "filename": "cobblemonalphas-1.4.1.jar",
-      "urls": [
-        "https://cdn.modrinth.com/data/QnWyhFGf/versions/wVSPSTdd/cobblemonalphas-1.4.1.jar"
-      ],
-      "sha512": "5404c8d8cb19f09b562169d5deef0afca7318409e87e41ca3a1848ff69b46c18fd2bdc2b187049234405bafda60c87f10204e6fc59018e61c951236faf8d7172",
-      "size": 510732
     },
     {
       "name": "Cobblemon Raid Dens 0.12.1+1.21.1",
