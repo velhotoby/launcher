@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.22`
-- Tag estável: `v3.4.22`
+- Versão estável publicada: `3.4.23`
+- Tag estável: `v3.4.23`
 - Versão local em teste: `3.4.23`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.23.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.22`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -57,7 +57,15 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   aprovados; os 129 arquivos locais também foram validados por nome, tamanho e SHA-512
 - SHA-256 local do JAR `3.4.23`:
   `a6174462bc16cdb940dc368cee1b8130cd67000da63411bd84fc3161ea650e91`
-- A versão `3.4.23` é somente local para teste e ainda não foi publicada no GitHub
+- A versão `3.4.23` foi publicada no GitHub pelo workflow `35543767125`; compilação, autotestes,
+  criação da release e retenção foram aprovados
+- O JAR público foi baixado novamente e aprovado em `--self-test` e `--backend-probe`; manifesto
+  com `Implementation-Version: 3.4.23`, catálogo com 129 mods e nenhuma das duas entradas
+  Cobblemon Alphas confirmados
+- SHA-256 do JAR público `3.4.23`:
+  `a071de146fd15fad3c673696452403a2b1180f543f44d18d2788e25bae2b01e0`
+- Retenção após a publicação: versões rotativas `3.4.23` e `3.4.22`, além da permanente
+  `3.4.21`; o JAR e o instalador da versão permanente continuam disponíveis
 
 ## Remoção do CobblemonRIzeTweaks — versão 3.4.22 local
 
