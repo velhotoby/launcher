@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 19 de setembro de 2026.
+Última atualização deste documento: 20 de setembro de 2026.
 
 ## Estado atual
 
@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.21`
 - Tag estável: `v3.4.21`
-- Versão local em teste: `3.4.21`
+- Versão local em teste: `3.4.22`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.21.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.22.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.21`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,28 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Remoção do CobblemonRIzeTweaks — versão 3.4.22 local
+
+- O `CobblemonRIzeTweaks 1.2.3` foi retirado porque estava causando incompatibilidade durante
+  batalhas
+- O projeto Modrinth `ON4VDdCA`, a versão `YxsbA4Hz` e o arquivo
+  `cobblemonRIzetweaks-1.2.3.jar` foram removidos do catálogo confiável incorporado; o catálogo
+  passou de 132 para 131 mods
+- A entrada de atalho obsoleta `key_key.cobblemonrizetweaks.jumpPCBox` também foi removida da
+  configuração padrão
+- A inspeção dos metadados `fabric.mod.json` de todos os mods ativos confirmou que nenhum outro
+  mod declara dependência do `cobblemonrizetweaks`
+- A instância local foi sincronizada com os 131 arquivos exatos do catálogo. O JAR removido foi
+  movido para `.launcher-mods-quarantine-v1`, permitindo recuperação, e não permanece em `mods/`
+- Teste real aprovado no servidor principal: conexão aceita, mundo carregado e 522 avanços
+  inicialmente sincronizados, sem tela de registros incompatíveis e sem o RIzeTweaks carregado
+- Autotestes de diagnóstico, descoberta, reparo, minimapa, desempenho, JAR e `--backend-probe`:
+  aprovados; os 131 arquivos locais também foram validados por nome, tamanho e SHA-512
+- SHA-256 local do JAR `3.4.22`:
+  `6263a2cdfb7c39cdd34aed59b0551b42c0a9a95e0c7c004f11694f490391a224`
+- A versão `3.4.22` ainda não foi publicada; a versão pública permanente continua sendo a
+  `3.4.21`
 
 ## Correção da sincronização com o servidor — versão 3.4.21 local
 

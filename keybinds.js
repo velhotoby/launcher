@@ -53,7 +53,7 @@ const STANDARD_BINDINGS = {
 const DISABLED_CONFLICTS = [
   'key_key.cobblemon-battle-extras.battle_logs', 'key_key.cobblemon_smartphone.scanner',
   'key_key.catchrate.show_comparison', 'key_key.catchrate.toggle_hud',
-  'key_key.cobblemonraiddens.mouse', 'key_key.cobblemonrizetweaks.jumpPCBox',
+  'key_key.cobblemonraiddens.mouse',
   'key_key.techreborn.quantumSuitSprint', 'key_key.techreborn.suitNightVision',
   'key_gui.xaero_new_waypoint', 'key_gui.xaero_enlarge_map',
   'key_key.travelersbackpack.cycle_tool', 'key_key.jei.bookmark',

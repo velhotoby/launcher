@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.21";
+    private static final String CURRENT_VERSION = "3.4.22";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -117,9 +117,9 @@ public final class LauncherApp extends JFrame {
                 }
                 Object json = MiniJson.parse("{\"ok\":true,\"items\":[1,\"pt_br\"]}");
                 if (!(json instanceof java.util.Map<?, ?>)) throw new IllegalStateException("Falha no leitor JSON.");
-                if (!UpdateService.isNewer("3.4.22", "3.4.21")
-                        || UpdateService.isNewer("3.4.21", "3.4.21")
-                        || UpdateService.isNewer("3.4.20", "3.4.21")) {
+                if (!UpdateService.isNewer("3.4.23", "3.4.22")
+                        || UpdateService.isNewer("3.4.22", "3.4.22")
+                        || UpdateService.isNewer("3.4.21", "3.4.22")) {
                     throw new IllegalStateException("Falha na comparação de versões do atualizador.");
                 }
                 EventBannerService.selfTest();
@@ -368,7 +368,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.21", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.22", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();

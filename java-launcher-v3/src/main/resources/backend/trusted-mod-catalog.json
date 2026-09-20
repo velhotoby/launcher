@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "cobblemon-legacy",
-  "packVersion": "2026.09.19",
+  "packVersion": "2026.09.20",
   "minecraft": "1.21.1",
   "loader": "fabric",
   "mods": [
@@ -667,19 +667,6 @@
       ],
       "sha512": "6e733780cb4a630f6a3abdd7c90848a791dbdc5aef28d7a524119594b31851c96824dc21c37f832a7355b57df6b93135dd875588094cdd8245337221b2a3848f",
       "size": 12739565
-    },
-    {
-      "name": "Cobblemon RIze Tweaks 1.2.3",
-      "source": "modrinth",
-      "projectId": "ON4VDdCA",
-      "versionId": "YxsbA4Hz",
-      "versionNumber": "1.2.3",
-      "filename": "cobblemonRIzetweaks-1.2.3.jar",
-      "urls": [
-        "https://cdn.modrinth.com/data/ON4VDdCA/versions/YxsbA4Hz/cobblemonRIzetweaks-1.2.3.jar"
-      ],
-      "sha512": "f9d469bc373a60cc7b24e310ddaaa562321cc808b93039e5a4051bf25f06fb66207de9ce69a58a1337ec8c2795cc3a9e86ce207abfbc710ec7fa5dfad530feeb",
-      "size": 88251
     },
     {
       "name": "Cobblemon Quests Reloaded 1.3.5",
