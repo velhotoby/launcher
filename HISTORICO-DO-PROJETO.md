@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.27`
-- Tag estável: `v3.4.27`
-- Versão local em teste: `3.4.29`
+- Versão estável publicada: `3.4.29`
+- Tag estável: `v3.4.29`
+- Versão local atual: `3.4.29`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.27`
+- JAR local atual: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.29`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +40,7 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Waystones alinhado ao servidor — versão 3.4.29 local
+## Waystones alinhado ao servidor — versão 3.4.29 publicada
 
 - Após as correções da `3.4.28`, o cliente chegou a sincronizar dados do servidor, mas foi
   desconectado com a mensagem exata: o servidor exige `Waystones 21.1.41` e o catálogo recebido
@@ -56,8 +56,15 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   reparo de servidor, JAR e backend: aprovados
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
 - SHA-256 local: `ffa5cac99c5f56e5e765e1f51d00ef1420693f667577a0ddfa09b4b219e57b6e`
-- A versão `3.4.29` ainda não foi publicada no GitHub nem teve uma nova conexão real testada após
-  a troca do Waystones
+- A versão `3.4.29` foi publicada pelo workflow `35552900166`; compilação, autotestes,
+  criação da release e política de retenção concluíram com sucesso
+- O JAR público foi baixado novamente e aprovado no autoteste e no teste de backend, com
+  `Implementation-Version: 3.4.29`, catálogo `2026.09.20.4` e 127 mods
+- SHA-256 do JAR público:
+  `c91c6a025bdbce3d69299b9cbd2786a02fa45753181934fd29bebbd2ce5d7b06`
+- Retenção após a publicação: versões rotativas `3.4.29` e `3.4.27`, além da permanente
+  `3.4.21`
+- Ainda não houve uma nova conexão real ao servidor testada após a troca do Waystones
 
 ## Correção do catálogo incompatível — versão 3.4.28 local
 
