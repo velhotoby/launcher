@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.23`
-- Tag estável: `v3.4.23`
-- Versão local em teste: `3.4.27`
+- Versão estável publicada: `3.4.27`
+- Tag estável: `v3.4.27`
+- Versão local: `3.4.27`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.27`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -59,7 +59,14 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `6512755fe16a1972bf7e4c4887108f1bb7e708579fab7558422f0432adfa9249`
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
 - SHA-256 local: `6eee0dd1ad0c4295882cc3d2b4097661e4015dc8dd6825bd95ab4232e70b747a`
-- A versão `3.4.27` ainda não foi publicada no GitHub
+- A versão `3.4.27` foi publicada pelo workflow `35551525501`; compilação, autotestes,
+  criação da release e política de retenção concluíram com sucesso
+- O JAR público foi baixado novamente e aprovado no autoteste, com
+  `Implementation-Version: 3.4.27` e o catálogo incorporado idêntico ao anexo
+- SHA-256 do JAR público:
+  `dcf3e3a65bb7c9c23fb36a77db00ee18d636d2af0779da1afffe70acadff57db`
+- Retenção após a publicação: versões rotativas `3.4.27` e `3.4.23`, além da permanente
+  `3.4.21`
 
 ## Todos os resource packs disponíveis ativados — versão 3.4.26 local
 
