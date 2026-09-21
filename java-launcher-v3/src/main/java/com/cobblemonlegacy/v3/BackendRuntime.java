@@ -21,7 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 final class BackendRuntime {
-    private static final String BACKEND_VERSION = "3.4.27-r1";
+    private static final String BACKEND_VERSION = "3.4.28-r1";
     private static final String NODE_VERSION = "v24.15.0";
     private final Path launcherRoot = Path.of(System.getProperty("user.home"), ".cobblemon_legacy_launcher");
 
@@ -106,7 +106,7 @@ final class BackendRuntime {
         try {
             HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).followRedirects(HttpClient.Redirect.NORMAL).build();
             HttpRequest request = HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(5))
-                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.27").build();
+                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.28").build();
             HttpResponse<Path> response = client.send(request, HttpResponse.BodyHandlers.ofFile(archive));
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 throw new IOException("Falha ao baixar Node.js: HTTP " + response.statusCode());

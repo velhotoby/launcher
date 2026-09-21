@@ -41,6 +41,7 @@ jobs:
           node java-launcher-v3/src/main/resources/backend/server-error-diagnostics.js --self-test
           node java-launcher-v3/tools/test-xaero-minimap.js
           node java-launcher-v3/tools/test-resource-pack-compat.js
+          node java-launcher-v3/tools/test-server-mod-compat.js
           node java-launcher-v3/tools/test-server-repair.js
           node java-launcher-v3/tools/test-mod-discovery.js
 

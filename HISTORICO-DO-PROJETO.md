@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.27`
 - Tag estável: `v3.4.27`
-- Versão local: `3.4.27`
+- Versão local em teste: `3.4.28`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.28.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.27`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,27 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Correção do catálogo incompatível — versão 3.4.28 local
+
+- O erro da `3.4.27` foi confirmado em `latest.log` e no diagnóstico salvo pelo launcher ao
+  conectar em `cobblemonlegacy.com.br:25565`: o cliente não possuía os registros
+  `supplementaries:cooperative_pistons` e `easy_npc:none_skin_configuration` exigidos pelo servidor
+- A causa foi a atualização indevida do `Supplementaries` `3.9.7` para `3.9.9` e do par
+  `Easy NPC`/`Easy NPC Config UI` `7.6.0` para `7.12.1` no catálogo recebido para a `3.4.27`
+- O catálogo `2026.09.20.3` restaura `Supplementaries 3.9.7`, `Easy NPC 7.6.0` e
+  `Easy NPC Config UI 7.6.0`; os tamanhos e SHA-512 coincidem com os arquivos oficiais
+- `Cobblemon RIze Tweaks 1.2.3` também foi retirado novamente por sua incompatibilidade conhecida
+  durante batalhas; o catálogo passa de 128 para 127 mods
+- Um novo autoteste de compatibilidade fixa essas três versões críticas e impede que o RIzeTweaks
+  seja reintroduzido sem que a publicação falhe no GitHub Actions
+- A instância real foi sincronizada: 3 versões corretas baixadas, 4 JARs incompatíveis movidos
+  para a quarentena recuperável e todos os 127 arquivos finais conferidos por nome, tamanho e SHA-512
+- Autotestes do catálogo crítico, resource packs, minimapa, descoberta, desempenho, diagnóstico,
+  reparo de servidor, JAR e backend: aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.28.jar`
+- SHA-256 local: `eca13d689b70007c715966d087de8a0a3e92f6f825ae9ba7e4aeed8983497632`
+- A versão `3.4.28` ainda não foi publicada no GitHub
 
 ## Catálogo de mods recebido — versão 3.4.27 local
 
