@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.23`
 - Tag estável: `v3.4.23`
-- Versão local em teste: `3.4.25`
+- Versão local em teste: `3.4.26`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.25.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.26.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,26 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Todos os resource packs disponíveis ativados — versão 3.4.26 local
+
+- Além dos cinco pacotes já tratados na 3.4.25, o launcher passa a ativar automaticamente
+  `cobblemon:uniqueshinyforms`, `cobblemon_smartphone:oldsmartphone`, `high_contrast`,
+  `programmer_art`, `mega_showdown:gyaradosjumpingmega`, `mega_showdown:regionbiasmsd`,
+  `reborncore:reborncore_darkmode` e `supplementaries:darker_ropes`
+- Os IDs foram confirmados diretamente no bytecode e nos `pack.mcmeta` dos JARs instalados;
+  o pacote de compatibilidade do Adorn não é registrado porque o mod Adorn não está instalado
+- O `Darker Ropes` oficial declara formato 15. Como o usuário solicitou todos os pacotes, ele é
+  selecionado e incluído em `incompatibleResourcePacks` como confirmação prévia; isso evita a
+  caixa de confirmação do Minecraft 1.21.1 e mantém o pacote carregável
+- A ordem dos 14 pacotes obrigatórios agora é normalizada para todos; pacotes extras do jogador
+  vêm depois e, por último, fica `file/Cobblemon Legacy Compat` com prioridade máxima
+- A instância real ficou com os 14 IDs obrigatórios selecionados, o pacote adicional de tradução
+  preservado e somente `supplementaries:darker_ropes` na confirmação de incompatibilidade
+- Autotestes do resource pack, JAR, desempenho, diagnóstico, minimapa e descoberta: aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.26.jar`
+- SHA-256 local: `b922855a7d249ad6193733d6e4045b7cca1363afb48947a3015c8510c69e1efa`
+- A versão 3.4.26 ainda não foi publicada no GitHub
 
 ## Resource packs integrados ativados — versão 3.4.25 local
 

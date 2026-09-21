@@ -6,6 +6,7 @@ const {
   PACK_DIRECTORY,
   PACK_ID,
   REQUIRED_RESOURCE_PACK_IDS,
+  CONFIRMED_INCOMPATIBLE_PACK_IDS,
   ensureCompatibilityPack,
   updateOptions
 } = require('../src/main/resources/backend/resource-pack-compat');
@@ -17,7 +18,8 @@ const updated = updateOptions([
   ''
 ].join('\n'));
 assert.match(updated, new RegExp(`resourcePacks:.*${PACK_DIRECTORY}`));
-assert.match(updated, /incompatibleResourcePacks:\["file\/Meu Pack Antigo"\]/);
+assert.match(updated,
+  /incompatibleResourcePacks:\["file\/Meu Pack Antigo","supplementaries:darker_ropes"\]/);
 assert.doesNotMatch(updated, /appleskin/);
 assert.equal((updated.match(new RegExp(PACK_DIRECTORY, 'g')) || []).length, 1,
   'O pacote deve aparecer uma única vez nas opções.');
@@ -43,7 +45,12 @@ const instance = fs.mkdtempSync(path.join(os.tmpdir(), 'cobblemon-resource-pack-
       new RegExp(`resourcePacks:.*${PACK_DIRECTORY}`));
     const installed = JSON.parse(fs.readFileSync(path.join(instance, 'options.txt'), 'utf8')
       .split('\n').find((line) => line.startsWith('resourcePacks:')).slice('resourcePacks:'.length));
-    assert.deepEqual(installed.slice(-6), [...REQUIRED_RESOURCE_PACK_IDS, PACK_ID]);
+    assert.deepEqual(installed.slice(-(REQUIRED_RESOURCE_PACK_IDS.length + 1)),
+      [...REQUIRED_RESOURCE_PACK_IDS, PACK_ID]);
+    const confirmed = JSON.parse(fs.readFileSync(path.join(instance, 'options.txt'), 'utf8')
+      .split('\n').find((line) => line.startsWith('incompatibleResourcePacks:'))
+      .slice('incompatibleResourcePacks:'.length));
+    assert.deepEqual(confirmed, CONFIRMED_INCOMPATIBLE_PACK_IDS);
     const second = await ensureCompatibilityPack(instance);
     assert.equal(second.changed, false, 'A segunda execução não deve regravar arquivos corretos.');
     console.log('RESOURCE PACK COMPAT OK: formato 34, ativação, escrita atômica e idempotência.');

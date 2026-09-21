@@ -5,12 +5,22 @@ const yauzl = require('yauzl');
 const PACK_DIRECTORY = 'Cobblemon Legacy Compat';
 const PACK_ID = `file/${PACK_DIRECTORY}`;
 const REQUIRED_RESOURCE_PACK_IDS = [
+  'vanilla',
   'fabric',
   'cobblemon:regionbiasforms',
   'cobblemon:gyaradosjump',
   '$polymer-resources',
-  'moonlight:merged_pack'
+  'moonlight:merged_pack',
+  'cobblemon:uniqueshinyforms',
+  'cobblemon_smartphone:oldsmartphone',
+  'high_contrast',
+  'programmer_art',
+  'mega_showdown:gyaradosjumpingmega',
+  'mega_showdown:regionbiasmsd',
+  'reborncore:reborncore_darkmode',
+  'supplementaries:darker_ropes'
 ];
+const CONFIRMED_INCOMPATIBLE_PACK_IDS = ['supplementaries:darker_ropes'];
 // São pacotes internos sempre ativados pelo Fabric. Mantê-los na lista de incompatíveis do
 // options.txt faz o Minecraft emitir "Removed resource pack" em toda abertura, embora os mods
 // os carreguem novamente logo depois.
@@ -153,11 +163,9 @@ function updateOptions(content) {
       try { packs = JSON.parse(line.slice('resourcePacks:'.length)); }
       catch { packs = ['fabric']; }
       if (!Array.isArray(packs)) packs = ['fabric'];
-      packs = packs.filter((item) => item !== PACK_ID);
-      for (const required of REQUIRED_RESOURCE_PACK_IDS) {
-        if (!packs.includes(required)) packs.push(required);
-      }
-      packs.push(PACK_ID);
+      const extras = packs.filter(
+        (item) => item !== PACK_ID && !REQUIRED_RESOURCE_PACK_IDS.includes(item));
+      packs = [...REQUIRED_RESOURCE_PACK_IDS, ...extras, PACK_ID];
       return `resourcePacks:${JSON.stringify(packs)}`;
     }
     if (line.startsWith('incompatibleResourcePacks:')) {
@@ -166,14 +174,18 @@ function updateOptions(content) {
       try { packs = JSON.parse(line.slice('incompatibleResourcePacks:'.length)); }
       catch { packs = []; }
       if (!Array.isArray(packs)) packs = [];
-      return `incompatibleResourcePacks:${JSON.stringify(packs.filter(
-        (item) => item !== PACK_ID && !STALE_MOD_PACK_IDS.has(item)))}`;
+      const confirmed = packs.filter(
+        (item) => item !== PACK_ID && !STALE_MOD_PACK_IDS.has(item)
+          && !CONFIRMED_INCOMPATIBLE_PACK_IDS.includes(item));
+      confirmed.push(...CONFIRMED_INCOMPATIBLE_PACK_IDS);
+      return `incompatibleResourcePacks:${JSON.stringify(confirmed)}`;
     }
     return line;
   });
   if (!resourcePacksFound) updated.push(
     `resourcePacks:${JSON.stringify([...REQUIRED_RESOURCE_PACK_IDS, PACK_ID])}`);
-  if (!incompatibleFound) updated.push('incompatibleResourcePacks:[]');
+  if (!incompatibleFound) updated.push(
+    `incompatibleResourcePacks:${JSON.stringify(CONFIRMED_INCOMPATIBLE_PACK_IDS)}`);
   return `${updated.join(newline)}${newline}`;
 }
 
@@ -211,6 +223,7 @@ module.exports = {
   PACK_DIRECTORY,
   PACK_ID,
   REQUIRED_RESOURCE_PACK_IDS,
+  CONFIRMED_INCOMPATIBLE_PACK_IDS,
   ensureCompatibilityPack,
   updateOptions
 };
