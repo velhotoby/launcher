@@ -1,8 +1,8 @@
-# Cobblemon Legacy Launcher 3.4.26
+# Cobblemon Legacy Launcher 3.4.27
 
 Versão Java multiplataforma do launcher da comunidade.
 
-O visual 3.4.26 reproduz a identidade do site oficial: banner da comunidade, tipografia
+O visual 3.4.27 reproduz a identidade do site oficial: banner da comunidade, tipografia
 Chakra Petch/Inter, cartões creme com contornos escuros e a paleta vermelho, azul e verde.
 As funções e configurações da versão 3.4.6 foram preservadas.
 O banner panorâmico aparece inteiro e centralizado sobre um fundo escurecido da mesma arte,
@@ -39,7 +39,7 @@ e `sensible-browser`, além de um botão para repetir a abertura ou copiar o end
 
 ## Desempenho automático
 
-A versão 3.4.26 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
+A versão 3.4.27 detecta a memória física e a quantidade de processadores lógicos antes de iniciar
 o Minecraft. Com esses dados, seleciona um perfil econômico, equilibrado ou de alto desempenho e
 define uma quantidade segura de RAM para a JVM (de 2 a 6 GB, conforme o computador).
 
@@ -59,7 +59,7 @@ A versão baixada abre em um processo independente no Linux e no Windows. Depois
 janela inicia, ela valida e exclui somente o JAR anterior do Cobblemon Legacy Launcher; arquivos
 que não correspondam a uma versão válida e mais antiga nunca entram nessa limpeza.
 
-Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.26.jar`.
+Compile com `./build.sh`. O resultado é salvo em `../dist/Cobblemon-Legacy-Launcher-3.4.27.jar`.
 
 ## Eventos
 
@@ -77,11 +77,11 @@ confere o SHA-256 antes de exibir.
 
 ## Sincronização de mods
 
-A versão 3.4.26 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
+A versão 3.4.27 usa `trusted-mod-catalog.json` e não acessa o Google Drive. Os arquivos são
 baixados apenas de hosts HTTPS aprovados (Modrinth CDN, CurseForge CDN e Maven oficial da FTB),
 sempre com validação de tamanho e SHA-512.
 
-Antes de abrir o jogo, a versão 3.4.26 também cria e ativa o pacote local
+Antes de abrir o jogo, a versão 3.4.27 também cria e ativa o pacote local
 `Cobblemon Legacy Compat`. Ele corrige referências de modelos, texturas e JSONs defeituosos
 encontrados nos mods oficiais sem modificar os JARs verificados nem alterar o conjunto exigido
 pelo servidor.

@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.23`
 - Tag estável: `v3.4.23`
-- Versão local em teste: `3.4.26`
+- Versão local em teste: `3.4.27`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.26.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.23`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,27 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Catálogo de mods recebido — versão 3.4.27 local
+
+- `java-launcher-v3/src/main/resources/backend/trusted-mod-catalog.json` foi substituído
+  exatamente pelo arquivo fornecido pelo usuário, com `packVersion` `2026.09.20.2` e 128 mods
+- Comparado ao catálogo anterior: 30 projetos foram atualizados, 2 foram removidos
+  (`Cobblemon Size Variations` e `SimpleTMs`) e 1 foi adicionado (`Cobblemon RIze Tweaks 1.2.3`)
+- A substituição também atualiza `Supplementaries` de `3.9.7` para `3.9.9`; tanto essa troca
+  quanto a volta do `Cobblemon RIze Tweaks` contrariam ressalvas registradas em versões anteriores,
+  mas foram mantidas para preservar sem alterações o catálogo explicitamente fornecido
+- O validador interno aprovou esquema, nomes, tamanhos, hashes SHA-512 e hosts: 125 arquivos vêm
+  do CDN do Modrinth e 3 do Maven oficial da FTB
+- Os 31 arquivos adicionados ou alterados foram baixados das URLs declaradas e conferidos
+  integralmente; os 31 tamanhos e hashes SHA-512 coincidem com o catálogo (104.894.046 bytes)
+- Autotestes do launcher, backend, desempenho, diagnóstico, reparo de servidor, minimapa,
+  descoberta de mods e resource packs: aprovados
+- O catálogo incorporado no JAR é idêntico ao anexo, com SHA-256
+  `6512755fe16a1972bf7e4c4887108f1bb7e708579fab7558422f0432adfa9249`
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.27.jar`
+- SHA-256 local: `6eee0dd1ad0c4295882cc3d2b4097661e4015dc8dd6825bd95ab4232e70b747a`
+- A versão `3.4.27` ainda não foi publicada no GitHub
 
 ## Todos os resource packs disponíveis ativados — versão 3.4.26 local
 
