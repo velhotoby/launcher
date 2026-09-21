@@ -33,7 +33,7 @@ final class UpdateService {
                 .timeout(Duration.ofSeconds(20))
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
-                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.28")
+                .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.29")
                 .GET().build();
         HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 404) {
@@ -81,7 +81,7 @@ final class UpdateService {
             HttpRequest request = HttpRequest.newBuilder(release.downloadUrl())
                     .timeout(Duration.ofMinutes(5))
                     .header("Accept", "application/octet-stream")
-                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.28")
+                    .header("User-Agent", "Cobblemon-Legacy-Launcher/3.4.29")
                     .GET().build();
             HttpResponse<InputStream> response = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {

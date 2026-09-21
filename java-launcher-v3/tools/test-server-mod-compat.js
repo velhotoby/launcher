@@ -8,7 +8,8 @@ const byProject = new Map(catalog.mods.map((mod) => [mod.projectId, mod]));
 const expected = new Map([
   ['Epm6R3P2', ['7.6.0', 'easy_npc-fabric-1.21.1-7.6.0.jar']],
   ['uTGjf7vA', ['7.6.0', 'easy_npc_config_ui-fabric-1.21.1-7.6.0.jar']],
-  ['fFEIiSDQ', ['1.21.1-3.9.7', 'supplementaries-1.21.1-3.9.7-fabric.jar']]
+  ['fFEIiSDQ', ['1.21.1-3.9.7', 'supplementaries-1.21.1-3.9.7-fabric.jar']],
+  ['LOpKHB2A', ['21.1.41+fabric-1.21.1', 'waystones-fabric-1.21.1-21.1.41.jar']]
 ]);
 
 for (const [projectId, [versionNumber, filename]] of expected) {
@@ -22,4 +23,4 @@ for (const [projectId, [versionNumber, filename]] of expected) {
 assert.ok(!byProject.has('ON4VDdCA'),
   'Cobblemon RIze Tweaks não pode voltar ao catálogo: causa incompatibilidade em batalhas.');
 
-console.log('SERVER MOD COMPAT OK: Easy NPC, Supplementaries e bloqueio do RIzeTweaks validados.');
+console.log('SERVER MOD COMPAT OK: Easy NPC, Supplementaries, Waystones e bloqueio do RIzeTweaks validados.');

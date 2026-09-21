@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "cobblemon-legacy",
-  "packVersion": "2026.09.20.3",
+  "packVersion": "2026.09.20.4",
   "minecraft": "1.21.1",
   "loader": "fabric",
   "mods": [
@@ -1553,17 +1553,17 @@
       "size": 839492
     },
     {
-      "name": "21.1.45+fabric-1.21.1",
+      "name": "21.1.41+fabric-1.21.1",
       "source": "modrinth",
       "projectId": "LOpKHB2A",
-      "versionId": "kcpLmG41",
-      "versionNumber": "21.1.45+fabric-1.21.1",
-      "filename": "waystones-fabric-1.21.1-21.1.45.jar",
+      "versionId": "qtRSzbaZ",
+      "versionNumber": "21.1.41+fabric-1.21.1",
+      "filename": "waystones-fabric-1.21.1-21.1.41.jar",
       "urls": [
-        "https://cdn.modrinth.com/data/LOpKHB2A/versions/kcpLmG41/waystones-fabric-1.21.1-21.1.45.jar"
+        "https://cdn.modrinth.com/data/LOpKHB2A/versions/qtRSzbaZ/waystones-fabric-1.21.1-21.1.41.jar"
       ],
-      "sha512": "02761245fbd0fbc86de77d0a2e1ebd7aebd2263e83a598246cc339a125df343a53583eb5e678eb11c913180feceafbe16d69ea2d88b4da65d57544162d2a1068",
-      "size": 1245242
+      "sha512": "4d2d09d691c36f3eb0977043953c60ce74174a46f29127591e84a62ce82ac4dbdec135e299f34a59b10302b61d4e022db3533e20976b1124d2cace1f458bec12",
+      "size": 1242823
     },
     {
       "name": "Wild Battle API 1.1.2",

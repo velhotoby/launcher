@@ -13,6 +13,7 @@ const MOD_MISMATCH_PATTERNS = [
   /registry entr(?:y|ies).*missing from local registry/i,
   /entradas? de registro.*desconhecid/i,
   /incompatibilidade entre os mods do cliente e servidor/i,
+  /incompatibilidade de versão para/i,
   /incompatible mod set/i,
   /mod resolution encountered an incompatible/i,
   /missing required mods?/i,
@@ -104,6 +105,9 @@ function extractModRequirements(text) {
   for (const match of text.matchAll(/\b([a-z][a-z0-9_-]{1,63})@(?:(>=|=))?([0-9][a-z0-9.+_-]*)\b/gi)) {
     add(match[1], match[1], match[3], match[2] === '>=' ? 'minimum' : 'exact');
   }
+  for (const match of text.matchAll(/incompatibilidade de versão para\s+([a-z][a-z0-9_-]{1,63})\.\s*o servidor espera a versão\s+([0-9][a-z0-9.+_-]*)/gi)) {
+    add(match[1], match[1], match[2]);
+  }
   return [...found.values()].slice(0, 16);
 }
 
@@ -194,6 +198,14 @@ async function selfTest() {
       || missing.requirements[0].requiredVersion !== '1.2.3'
       || missing.requirements[1].rule !== 'minimum') {
     throw new Error('Falha ao extrair nomes e versões exigidos pelo erro.');
+  }
+  const portugueseVersion = analyzeConnectionFailure('Client disconnected with reason: '
+    + 'Incompatibilidade de versão para waystones. O servidor espera a versão 21.1.41, '
+    + 'mas você tem a versão 21.1.45 instalada atualmente.');
+  if (!portugueseVersion.canRepair || portugueseVersion.requirements.length !== 1
+      || portugueseVersion.requirements[0].id !== 'waystones'
+      || portugueseVersion.requirements[0].requiredVersion !== '21.1.41') {
+    throw new Error('Falha ao extrair incompatibilidade de versão em Português.');
   }
   const network = analyzeConnectionFailure('Client disconnected with reason: Connection timed out');
   if (!network.failure || network.modError || network.canRepair) {

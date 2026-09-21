@@ -52,6 +52,12 @@ async function main() {
       + 'The following registry entry namespaces may be related:\n\ncobblemonalphas');
     assert.ok(registry.repair.namespaces.includes('cobblemonalphas'));
 
+    const versionMismatch = await simulate(temporary, 'enx-cirion-16.enx.host, 10068',
+      'Client disconnected with reason: Incompatibilidade de versão para waystones. '
+      + 'O servidor espera a versão 21.1.41, mas você tem a versão 21.1.45 instalada atualmente.');
+    assert.equal(versionMismatch.repair.requirements[0].id, 'waystones');
+    assert.equal(versionMismatch.repair.requirements[0].requiredVersion, '21.1.41');
+
     assert.equal(versionMatches('1.2.3', { requiredVersion: '1.2.3', rule: 'exact' }), true);
     assert.equal(versionMatches('1.2.4', { requiredVersion: '1.2.3', rule: 'exact' }), false);
     assert.equal(versionMatches('1.2.4', { requiredVersion: '1.2.3', rule: 'minimum' }), true);

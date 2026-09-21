@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.27`
 - Tag estável: `v3.4.27`
-- Versão local em teste: `3.4.28`
+- Versão local em teste: `3.4.29`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.28.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.27`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,25 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Waystones alinhado ao servidor — versão 3.4.29 local
+
+- Após as correções da `3.4.28`, o cliente chegou a sincronizar dados do servidor, mas foi
+  desconectado com a mensagem exata: o servidor exige `Waystones 21.1.41` e o catálogo recebido
+  havia instalado `21.1.45`
+- O catálogo `2026.09.20.4` restaura o projeto Modrinth `LOpKHB2A` para a versão `21.1.41`,
+  arquivo `waystones-fabric-1.21.1-21.1.41.jar`, com tamanho e SHA-512 oficiais verificados
+- O teste de compatibilidade do conjunto crítico agora fixa também essa versão do Waystones
+- O diagnóstico passou a reconhecer a mensagem em Português `Incompatibilidade de versão para ...`
+  e extrair ID e versão exata; esse formato pode acionar o autorreparo seguro em futuras falhas
+- A instância real foi sincronizada com os 127 mods: Waystones `21.1.41` baixado, `21.1.45`
+  movido para a quarentena e todos os arquivos finais conferidos por nome, tamanho e SHA-512
+- Autotestes do catálogo crítico, resource packs, minimapa, descoberta, desempenho, diagnóstico,
+  reparo de servidor, JAR e backend: aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
+- SHA-256 local: `ffa5cac99c5f56e5e765e1f51d00ef1420693f667577a0ddfa09b4b219e57b6e`
+- A versão `3.4.29` ainda não foi publicada no GitHub nem teve uma nova conexão real testada após
+  a troca do Waystones
 
 ## Correção do catálogo incompatível — versão 3.4.28 local
 
