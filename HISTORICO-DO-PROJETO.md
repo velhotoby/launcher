@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 20 de setembro de 2026.
+Última atualização deste documento: 4 de outubro de 2026.
 
 ## Estado atual
 
@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.29`
 - Tag estável: `v3.4.29`
-- Versão local atual: `3.4.29`
+- Versão local em teste: `3.4.30`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local atual: `dist/Cobblemon-Legacy-Launcher-3.4.29.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.29`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,31 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Diagnóstico de crash e restauração — versão 3.4.30 local
+
+- O código Windows `4294967295` exibido aos usuários é a representação sem sinal de `-1`; ele
+  informa somente um encerramento inesperado e não identifica sozinho o mod ou componente culpado
+- Os relatórios históricos disponíveis confirmaram causas reais diferentes por trás desse mesmo
+  tipo de encerramento, incluindo `NoSuchMethodError` entre versões de mods e
+  `NoClassDefFoundError` provocado pelo antigo CobblemonRIzeTweaks durante batalhas; portanto a
+  causa de um usuário específico ainda depende do `crash-report` ou `latest.log` daquela execução
+- O backend agora procura apenas relatórios criados na execução que acabou de falhar, traduz o
+  código `4294967295` para `-1` e apresenta um resumo para falta de memória, falha nativa de
+  Java/driver, entrypoint, Mixin, classe ou método ausente e conjunto de mods incompatível
+- O novo botão `RESTAURAR` redefine configurações e componentes reconstruíveis. Faz backup de
+  `config`, `options.txt`, `optionsof.txt` e do catálogo de mods descobertos, remove caches,
+  bibliotecas, runtime, versões e estados gerenciados, e força nova conferência na próxima abertura
+- A restauração preserva `saves`, screenshots, mapas e waypoints, servidores, logs, nickname,
+  resource packs do usuário e os mods confiáveis; hashes dos mods continuam sendo verificados pela
+  sincronização e arquivos extras são enviados à quarentena
+- Backups ficam em `.launcher-restore-backups` dentro da instância e passam a ser preservados pela
+  limpeza do núcleo
+- Autotestes de restauração, diagnóstico de crash, catálogo crítico, resource packs, minimapa,
+  descoberta de mods, desempenho, diagnóstico/reparo de servidor, JAR e backend: aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
+- SHA-256 local: `13e4650cdd442180198c1d86d87d1782d7aab585e096f10cf7d48cc36fa5b16d`
+- A versão `3.4.30` ainda não foi publicada no GitHub nem testada visualmente no Windows
 
 ## Waystones alinhado ao servidor — versão 3.4.29 publicada
 

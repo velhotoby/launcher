@@ -118,7 +118,8 @@ async function main() {
     else emit(code === 0 ? 'success' : 'error', code === 0
       ? 'Jogo encerrado normalmente.' : `O jogo encerrou com o código ${code ?? 'desconhecido'}.`);
   });
-  launcher.on('launch_crash', ({ code }) => emit('error', `Minecraft encerrou com o código ${code}. Consulte os relatórios de crash.`));
+  launcher.on('launch_crash', ({ code, diagnosis }) => emit('error', diagnosis?.message ||
+    `Minecraft encerrou com o código ${code}. Consulte os relatórios de crash e use Restaurar.`));
 
   const report = ({ type = 'status', message, current = 0, total = 0 }) => emit(type, message, current, total);
   const restoreFetch = installReliableFetch(({ attempt, totalAttempts, hostname }) => {

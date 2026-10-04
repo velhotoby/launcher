@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.29";
+    private static final String CURRENT_VERSION = "3.4.30";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -54,6 +54,7 @@ public final class LauncherApp extends JFrame {
     private final JLabel accountState = label("Nenhuma conta Microsoft conectada.", MUTED, 10, Font.PLAIN);
     private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", ButtonStyle.PRIMARY);
     private final ActionButton openDirectoryButton = new ActionButton("ABRIR DIRETÓRIO", ButtonStyle.SECONDARY);
+    private final ActionButton restoreButton = new ActionButton("RESTAURAR", ButtonStyle.SECONDARY);
     private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", ButtonStyle.DANGER);
     private final JCheckBox rememberMe = new JCheckBox("Lembrar de mim?");
     private final JCheckBox weakPcMode = new JCheckBox("PC Fraco");
@@ -81,10 +82,11 @@ public final class LauncherApp extends JFrame {
                         "const e=require('eml-lib');const n=require('prismarine-nbt');" +
                                 "const p=require('./performance-profile');" +
                                 "const d=require('./server-error-diagnostics');" +
+                                "const c=require('./crash-diagnostics');" +
                                 "const m=require('./xaero-minimap');" +
                                 "const r=require('./resource-pack-compat');" +
                                 "const i=require('./preserved-paths');" +
-                                "if(!e.Launcher||!n||!p.detectPerformanceProfile||!d.analyzeConnectionFailure||!m.ensureMinimapOnRight||!r.ensureCompatibilityPack||!i.includes('config/'))process.exit(2)")
+                                "if(!e.Launcher||!n||!p.detectPerformanceProfile||!d.analyzeConnectionFailure||!c.diagnoseCrash||!m.ensureMinimapOnRight||!r.ensureCompatibilityPack||!i.includes('config/')||!i.includes('.launcher-restore-backups/'))process.exit(2)")
                         .directory(prepared.backend().getParent().toFile()).inheritIO().start();
                 if (probe.waitFor() != 0) throw new IllegalStateException("Dependências internas indisponíveis.");
                 System.out.println("BACKEND-PROBE OK: núcleo incorporado e Node disponíveis.");
@@ -169,10 +171,26 @@ public final class LauncherApp extends JFrame {
                         || !"xdg-open".equals(InstanceDirectoryService.fallbackCommands(instance, "Linux")[0][0])) {
                     throw new IllegalStateException("Falha nos gerenciadores de arquivos multiplataforma.");
                 }
-                Files.delete(instance);
-                Files.delete(options);
-                Files.delete(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, eventos, banner centralizado, pasta da instância, nickname local e cancelamento Microsoft.");
+                Path restoreInstance = temporary.resolve("restore").resolve(".cobblemon_legacy");
+                Files.createDirectories(restoreInstance.resolve("config"));
+                Files.writeString(restoreInstance.resolve("config").resolve("teste.json"), "{}", StandardCharsets.UTF_8);
+                Files.createDirectories(restoreInstance.resolve("libraries"));
+                Files.writeString(restoreInstance.resolve("libraries").resolve("corrompida.jar"), "x", StandardCharsets.UTF_8);
+                Files.createDirectories(restoreInstance.resolve("saves").resolve("mundo"));
+                Files.writeString(restoreInstance.resolve("saves").resolve("mundo").resolve("level.dat"), "save", StandardCharsets.UTF_8);
+                Files.createDirectories(restoreInstance.resolve("mods"));
+                Files.writeString(restoreInstance.resolve("mods").resolve("mod-confiavel.jar"), "mod", StandardCharsets.UTF_8);
+                Files.writeString(restoreInstance.resolve("options.txt"), "lang:en_us\n", StandardCharsets.UTF_8);
+                InstanceRestoreService.Result restored = InstanceRestoreService.restore(restoreInstance);
+                if (restored.backedUp() != 2 || Files.exists(restoreInstance.resolve("config"))
+                        || Files.exists(restoreInstance.resolve("libraries"))
+                        || !Files.exists(restoreInstance.resolve("saves").resolve("mundo").resolve("level.dat"))
+                        || !Files.exists(restoreInstance.resolve("mods").resolve("mod-confiavel.jar"))
+                        || restored.backup() == null || !Files.exists(restored.backup().resolve("options.txt"))) {
+                    throw new IllegalStateException("Falha na restauração segura da instância.");
+                }
+                InstanceRestoreService.deleteRecursively(temporary);
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, eventos, banner centralizado, restauração segura, pasta da instância, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -351,14 +369,17 @@ public final class LauncherApp extends JFrame {
         playButton.addActionListener(event -> startGame());
         content.add(playButton);
         content.add(Box.createVerticalStrut(10));
-        JPanel utilityButtons = transparentPanel(new GridLayout(1, 2, 9, 0));
+        JPanel utilityButtons = transparentPanel(new GridLayout(1, 3, 7, 0));
         utilityButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
         utilityButtons.setPreferredSize(new Dimension(360, 40));
         utilityButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         openDirectoryButton.setToolTipText("Abrir a pasta onde ficam mods, configurações e arquivos do Minecraft");
         openDirectoryButton.addActionListener(event -> openInstanceDirectory());
+        restoreButton.setToolTipText("Reparar o Minecraft sem apagar mundos, screenshots ou servidores");
+        restoreButton.addActionListener(event -> restoreInstance());
         uninstallButton.addActionListener(event -> uninstall());
         utilityButtons.add(openDirectoryButton);
+        utilityButtons.add(restoreButton);
         utilityButtons.add(uninstallButton);
         content.add(utilityButtons);
         content.add(Box.createVerticalStrut(13));
@@ -369,7 +390,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.29", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.30", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -840,6 +861,53 @@ public final class LauncherApp extends JFrame {
         }.execute();
     }
 
+    private void restoreInstance() {
+        if (busy) return;
+        Path home = Path.of(System.getProperty("user.home")).toAbsolutePath().normalize();
+        Path instance = instancePath();
+        if (!InstanceDirectoryService.isExpectedInstance(instance, home)) {
+            statusCard.update("error", "O diretório da instância não é seguro para restauração.", 0);
+            return;
+        }
+
+        Object[] choices = {"Cancelar", "Restaurar"};
+        int answer = JOptionPane.showOptionDialog(this,
+                "O launcher vai redefinir configurações e caches do Minecraft e verificar todos os mods " +
+                        "na próxima inicialização.\n\nMundos, screenshots, mapas, servidores e nickname serão preservados. " +
+                        "As configurações atuais ficarão em uma pasta de backup.",
+                "Restaurar a instalação do Minecraft?", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, choices, choices[0]);
+        if (answer != 1) {
+            statusCard.update("status", "Restauração cancelada. Nenhum arquivo foi alterado.", 0);
+            return;
+        }
+
+        setBusy(true);
+        statusCard.update("working", "Restaurando configurações e componentes do Minecraft...", 20);
+        new SwingWorker<InstanceRestoreService.Result, Void>() {
+            @Override protected InstanceRestoreService.Result doInBackground() throws Exception {
+                return InstanceRestoreService.restore(instance);
+            }
+
+            @Override protected void done() {
+                try {
+                    InstanceRestoreService.Result result = get();
+                    String backup = result.backup() == null ? "Nenhuma configuração antiga precisava de backup."
+                            : "Backup das configurações: " + result.backup();
+                    statusCard.update("success", "Restauração concluída. Clique em Iniciar para baixar e verificar os componentes.", 100);
+                    JOptionPane.showMessageDialog(LauncherApp.this,
+                            "Restauração concluída com segurança.\n\n" + backup +
+                                    "\n\nMundos, screenshots, mapas, servidores e mods confiáveis foram preservados.",
+                            "Minecraft restaurado", JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception error) {
+                    statusCard.update("error", "Não foi possível restaurar: " + rootMessage(error), 0);
+                } finally {
+                    setBusy(false);
+                }
+            }
+        }.execute();
+    }
+
     private void setBusy(boolean value) {
         busy = value;
         username.setEnabled(!value && authMode == AuthMode.OFFLINE);
@@ -849,6 +917,7 @@ public final class LauncherApp extends JFrame {
         weakPcMode.setEnabled(!value);
         playButton.setEnabled(!value);
         openDirectoryButton.setEnabled(!value);
+        restoreButton.setEnabled(!value);
         uninstallButton.setEnabled(!value);
         playButton.setText(value ? "AGUARDE..." : "INICIAR AVENTURA");
     }

@@ -1,6 +1,7 @@
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { Launcher } = require('eml-lib');
+const { diagnoseCrash } = require('./crash-diagnostics');
 const {
   MAX_LOG_CHARS,
   analyzeConnectionFailure,
@@ -31,6 +32,7 @@ class AutoRepairLauncher extends Launcher {
   async run(javaPath, args) {
     this.launchArgs_ = args;
     return new Promise((resolve, reject) => {
+      const startedAt = Date.now();
       const minecraft = spawn(javaPath, args, { cwd: this.config.root, detached: false });
       const pending = { stdout: '', stderr: '' };
       let connection = null;
@@ -118,12 +120,20 @@ class AutoRepairLauncher extends Launcher {
         const exitCode = code ?? -1;
         this.emit('launch_close', exitCode);
         if (exitCode !== 0 && !this.repairRequested && !this.connectionDiagnostic) {
+          let diagnosis;
+          try { diagnosis = await diagnoseCrash(this.config.root, exitCode, startedAt); }
+          catch (error) {
+            diagnosis = {
+              message: `Minecraft encerrou com o código ${exitCode}. Não foi possível ler o relatório: ${error.message}`
+            };
+          }
           this.emit('launch_crash', {
             code: exitCode,
             date: new Date().toISOString(),
             javaPath,
             logsPath: path.join(this.config.root, 'logs', 'latest.log'),
-            crashReportsDir: path.join(this.config.root, 'crash-reports')
+            crashReportsDir: path.join(this.config.root, 'crash-reports'),
+            diagnosis
           });
         }
         resolve();

@@ -8,5 +8,6 @@ module.exports = [
   '.launcher-keybinds-v1.json', '.launcher-trusted-sync-v1.json',
   '.launcher-performance-v1.json',
   '.launcher-discovered-mods-v1.json', '.launcher-mods-quarantine-v1/',
-  '.launcher-mods-staging-v1/', '.launcher-mod-discovery-v1/'
+  '.launcher-mods-staging-v1/', '.launcher-mod-discovery-v1/',
+  '.launcher-restore-backups/'
 ];
