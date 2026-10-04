@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.29`
-- Tag estável: `v3.4.29`
-- Versão local em teste: `3.4.30`
+- Versão estável publicada: `3.4.30`
+- Tag estável: `v3.4.30`
+- Versão local atual: `3.4.30`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.29`
+- JAR local atual: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.30`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +40,7 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Diagnóstico de crash e restauração — versão 3.4.30 local
+## Diagnóstico de crash e restauração — versão 3.4.30 publicada
 
 - O código Windows `4294967295` exibido aos usuários é a representação sem sinal de `-1`; ele
   informa somente um encerramento inesperado e não identifica sozinho o mod ou componente culpado
@@ -63,7 +63,15 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   descoberta de mods, desempenho, diagnóstico/reparo de servidor, JAR e backend: aprovados
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
 - SHA-256 local: `13e4650cdd442180198c1d86d87d1782d7aab585e096f10cf7d48cc36fa5b16d`
-- A versão `3.4.30` ainda não foi publicada no GitHub nem testada visualmente no Windows
+- A versão `3.4.30` foi publicada pelo workflow `37176170833`; compilação, autotestes,
+  criação da release e política de retenção concluíram com sucesso
+- O JAR público foi baixado novamente e aprovado no autoteste e no teste de backend; manifesto,
+  diagnóstico de crash, restauração e preservação dos backups foram confirmados no artefato
+- SHA-256 do JAR público:
+  `dabc5de5172b66b75027b24e7e0dd4b34a3d573cc22bc2124a380054d091d4b8`
+- Retenção após a publicação: versões rotativas `3.4.30` e `3.4.29`, além da permanente
+  `3.4.21`; a antiga rotativa `3.4.27` foi removida
+- A interface foi aberta no Linux para teste, mas ainda não foi testada visualmente no Windows
 
 ## Waystones alinhado ao servidor — versão 3.4.29 publicada
 
