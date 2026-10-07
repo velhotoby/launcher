@@ -17,16 +17,17 @@ mudança relevante for concluída, testada ou publicada.
 - JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.32.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.32`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
-- Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
-  site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
-  limpeza estão automatizadas em `.github/workflows/release.yml`
+- Política de retenção pública: a release/tag `v3.4.32` é a versão definitiva e nunca entra na
+  limpeza; além dela, manter somente as duas releases/tags rotativas mais recentes. A `v3.4.21`
+  permanece temporariamente protegida apenas para não quebrar o link legado que pode ainda estar
+  no site. A proteção e a limpeza estão automatizadas em `.github/workflows/release.yml`
 
 Em 11 de setembro de 2026, as releases e tags `v3.4.8` e `v3.4.9` foram removidas do GitHub.
 Em 19 de setembro de 2026, a proteção permanente foi migrada da `v3.4.11` para a `v3.4.21`;
 o instalador genérico foi preservado na nova release e a antiga foi removida. A `v3.4.21` e os
-assets `Cobblemon-Legacy-Launcher-3.4.21.jar` e `Cobblemon-Legacy-Launcher-Installer.exe` nunca
-entram na limpeza. Ao publicar novas versões, o workflow preserva esses links e exclui
-automaticamente as releases rotativas que ultrapassarem o limite de duas.
+assets `Cobblemon-Legacy-Launcher-3.4.21.jar` e `Cobblemon-Legacy-Launcher-Installer.exe` não
+entravam na limpeza. Em 7 de outubro de 2026, a versão definitiva foi migrada para `v3.4.32`;
+o instalador da `v3.4.21` continua preservado somente como compatibilidade para o endereço antigo.
 
 ## Configuração do jogo
 
@@ -121,6 +122,9 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   do link público validado
 - Retenção após a publicação: versões rotativas `3.4.32` e `3.4.31`, além da permanente
   `3.4.21`; a rotativa `3.4.30` foi removida automaticamente
+- A `v3.4.32` foi posteriormente definida como versão definitiva. Seus quatro assets públicos
+  passam a ser verificados pelo workflow em toda publicação e nunca entram na limpeza automática;
+  a `v3.4.21` fica apenas como link legado temporariamente compatível
 
 ## Diagnóstico de crash e restauração — versão 3.4.30 publicada
 
@@ -561,22 +565,21 @@ Nome principal exibido: `cubblemon legacy`.
 ## Instalador online para Windows
 
 - Arquivo público:
-  `https://github.com/velhotoby/launcher/releases/download/v3.4.21/Cobblemon-Legacy-Launcher-Installer.exe`
-- Construído com Inno Setup e o design atual do launcher
-- Sempre consulta `releases/latest` durante a instalação
-- Baixa o JAR correspondente diretamente do GitHub
-- Valida o SHA-256 retornado pela API do GitHub antes de instalar
+  `https://github.com/velhotoby/launcher/releases/download/v3.4.32/Cobblemon-Legacy-Launcher-Installer.exe`
+- Construído como executável nativo x64 de estágio único, sem executar componente próprio em
+  `%TEMP%`
+- Sempre consulta `releases/latest/download` durante a instalação
+- Baixa o alias Windows da release mais recente diretamente do GitHub
+- Valida o SHA-256 publicado junto ao alias antes de instalar
 - Inclui runtime Java 21 x64 para Windows
-- Instala o executável nativo `CobblemonLegacyLauncher.exe`
-- O executável localiza semanticamente o JAR de maior versão instalado, mantendo os atalhos válidos
-  depois dos auto-updates
+- Instala um bootstrap Java que localiza semanticamente o JAR de maior versão, mantendo os atalhos
+  válidos depois dos auto-updates sem depender de um executável próprio intermediário
 - Cria atalhos no menu Iniciar, Área de Trabalho e diretório de itens fixados da barra de tarefas
-- O desinstalador remove também JARs que tenham sido baixados em atualizações posteriores
 - Ainda não possui assinatura Authenticode; o SmartScreen pode mostrar um aviso
 
 SHA-256 do instalador publicado:
 
-`36278cbbe96075dc6283d8162953624a1211dd41a23e549b8cddf69a9eff03f3`
+`9acf1a829ebac7f5628d0e5744de1f34d90f6de6d683a24f7de1b66b4b66b0e6`
 
 ## Validações mais recentes
 

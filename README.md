@@ -4,7 +4,7 @@ Launcher oficial multiplataforma da comunidade Cobblemon Legacy.
 
 ## Download
 
-No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.21/Cobblemon-Legacy-Launcher-Installer.exe):
+No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.32/Cobblemon-Legacy-Launcher-Installer.exe):
 ele baixa e valida automaticamente o JAR estável mais recente, instala o Java 21 e cria
 atalhos na Área de Trabalho, menu Iniciar e barra de tarefas. O instalador Windows 2.0 funciona
 em estágio único e não executa componentes próprios dentro de `%TEMP%`, evitando o fluxo que

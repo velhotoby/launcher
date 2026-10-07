@@ -64,32 +64,43 @@ jobs:
               --title "Cobblemon Legacy Launcher ${VERSION}" --generate-notes
           fi
 
-      - name: Preservar links do site e manter duas versões rotativas
+      - name: Preservar versão definitiva, link legado e duas versões rotativas
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          PROTECTED_RELEASE="v3.4.21"
-          PROTECTED_ASSETS=(
-            "Cobblemon-Legacy-Launcher-3.4.21.jar"
+          DEFINITIVE_RELEASE="v3.4.32"
+          DEFINITIVE_ASSETS=(
+            "Cobblemon-Legacy-Launcher-3.4.32.jar"
             "Cobblemon-Legacy-Launcher-Installer.exe"
+            "Cobblemon-Legacy-Launcher-Windows.jar"
+            "Cobblemon-Legacy-Launcher-Windows.jar.sha256"
           )
 
           mapfile -t PUBLISHED_ASSETS < <(
-            gh release view "$PROTECTED_RELEASE" --repo "$GITHUB_REPOSITORY" \
+            gh release view "$DEFINITIVE_RELEASE" --repo "$GITHUB_REPOSITORY" \
               --json assets --jq '.assets[].name'
           )
-          for ASSET in "${PROTECTED_ASSETS[@]}"; do
+          for ASSET in "${DEFINITIVE_ASSETS[@]}"; do
             if [[ ! " ${PUBLISHED_ASSETS[*]} " =~ " ${ASSET} " ]]; then
-              echo "Arquivo permanente ausente em ${PROTECTED_RELEASE}: ${ASSET}" >&2
+              echo "Arquivo definitivo ausente em ${DEFINITIVE_RELEASE}: ${ASSET}" >&2
               exit 1
             fi
           done
 
+          mapfile -t LEGACY_ASSETS < <(
+            gh release view "v3.4.21" --repo "$GITHUB_REPOSITORY" \
+              --json assets --jq '.assets[].name'
+          )
+          if [[ ! " ${LEGACY_ASSETS[*]} " =~ " Cobblemon-Legacy-Launcher-Installer.exe " ]]; then
+            echo "Link legado do instalador ausente em v3.4.21" >&2
+            exit 1
+          fi
+
           mapfile -t OLD_RELEASES < <(
             gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
               --json tagName,publishedAt \
-              --jq 'map(select(.tagName != "v3.4.21")) | sort_by(.publishedAt) | reverse | .[2:] | .[].tagName'
+              --jq 'map(select(.tagName != "v3.4.32" and .tagName != "v3.4.21")) | sort_by(.publishedAt) | reverse | .[2:] | .[].tagName'
           )
           for TAG in "${OLD_RELEASES[@]}"; do
             gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes
