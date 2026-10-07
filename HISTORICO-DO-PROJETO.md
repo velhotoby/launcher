@@ -4,7 +4,7 @@ Este arquivo é a memória técnica persistente do projeto. Ele existe porque o 
 pode não aparecer ao abrir uma nova sessão no VS Code. Atualize este documento sempre que uma
 mudança relevante for concluída, testada ou publicada.
 
-Última atualização deste documento: 4 de outubro de 2026.
+Última atualização deste documento: 7 de outubro de 2026.
 
 ## Estado atual
 
@@ -12,9 +12,9 @@ mudança relevante for concluída, testada ou publicada.
 - Branch principal: `main`
 - Versão estável publicada: `3.4.30`
 - Tag estável: `v3.4.30`
-- Versão local atual: `3.4.30`
+- Versão local em teste: `3.4.31`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local atual: `dist/Cobblemon-Legacy-Launcher-3.4.30.jar`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.31.jar`
 - Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.30`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
@@ -39,6 +39,33 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   `%USERPROFILE%\.cobblemon_legacy_launcher` no Windows
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
+
+## Exportação de logs para suporte — versão 3.4.31 local
+
+- A imagem recebida mostra o erro `4551` do instalador no Windows: uma política de Controle de
+  Aplicativos bloqueou a execução de um arquivo extraído no diretório temporário. Esse bloqueio
+  acontece antes de o launcher abrir e, portanto, não pode ser diagnosticado pelo botão interno
+- Para crashes, desconexões e falhas de quem consegue abrir o launcher, foi adicionado o botão
+  `SALVAR LOGS`; ele abre o seletor de pastas nativo e cria
+  `Cobblemon-Legacy-Logs-AAAAMMDD-HHMMSS.zip` no local escolhido pelo usuário
+- O pacote inclui todos os arquivos relevantes de `logs/`, `crash-reports/`, falhas nativas
+  `hs_err_pid`/`replay_pid`, estados de sincronização e desempenho, e os logs rotativos do launcher
+- `diagnostico-do-sistema.txt` registra versão do launcher, sistema, Java, CPU, memória, quantidade
+  de arquivos e a lista completa dos nomes dos mods instalados, facilitando a análise por um admin
+- A sessão e as credenciais Microsoft nunca entram no ZIP. Tokens conhecidos são ocultados no
+  log do launcher; a confirmação avisa que logs do Minecraft podem conter nickname, chat e
+  endereços de servidores
+- O log próprio do launcher fica em `~/.cobblemon_legacy_launcher/logs` no Linux ou no equivalente
+  em `%USERPROFILE%` no Windows, gira automaticamente a cada 2 MiB e mantém três arquivos antigos
+- A barra de ações mantém `ABRIR PASTA`, `SALVAR LOGS`, `RESTAURAR` e `DESINSTALAR`; a tipografia
+  foi ajustada e os quatro rótulos completos foram confirmados visualmente no Linux
+- Autotestes de exportação, exclusão de credenciais, ocultação de token, restauração, diagnóstico,
+  catálogo crítico, resource packs, minimapa, descoberta, desempenho, reparo, JAR e backend:
+  aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.31.jar`
+- SHA-256 local: `e8598c53f4f577bd705bccbff7e8ac9c0ad7c36e8f62ddc5a8c171afb692f3b0`
+- O layout foi conferido visualmente no Linux; a versão `3.4.31` ainda não foi publicada no
+  GitHub nem testada visualmente no Windows
 
 ## Diagnóstico de crash e restauração — versão 3.4.30 publicada
 

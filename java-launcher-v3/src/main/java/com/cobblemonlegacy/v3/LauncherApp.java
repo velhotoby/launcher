@@ -31,9 +31,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.30";
+    private static final String CURRENT_VERSION = "3.4.31";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -53,14 +54,16 @@ public final class LauncherApp extends JFrame {
     private final ModeButton microsoftMode = new ModeButton("CONTA MICROSOFT");
     private final JLabel accountState = label("Nenhuma conta Microsoft conectada.", MUTED, 10, Font.PLAIN);
     private final ActionButton playButton = new ActionButton("INICIAR AVENTURA", ButtonStyle.PRIMARY);
-    private final ActionButton openDirectoryButton = new ActionButton("ABRIR DIRETÓRIO", ButtonStyle.SECONDARY);
+    private final ActionButton openDirectoryButton = new ActionButton("ABRIR PASTA", ButtonStyle.SECONDARY);
+    private final ActionButton saveLogsButton = new ActionButton("SALVAR LOGS", ButtonStyle.SECONDARY);
     private final ActionButton restoreButton = new ActionButton("RESTAURAR", ButtonStyle.SECONDARY);
     private final ActionButton uninstallButton = new ActionButton("DESINSTALAR", ButtonStyle.DANGER);
     private final JCheckBox rememberMe = new JCheckBox("Lembrar de mim?");
     private final JCheckBox weakPcMode = new JCheckBox("PC Fraco");
     private final LocalNicknameStore localNickname = new LocalNicknameStore(Path.of(
             System.getProperty("user.home"), ".cobblemon_legacy_launcher", "local-nickname.txt"));
-    private final StatusCard statusCard = new StatusCard();
+    private final LauncherLogService launcherLog = new LauncherLogService(launcherHomePath());
+    private final StatusCard statusCard = new StatusCard(launcherLog);
     private final MicrosoftAuthService microsoft = new MicrosoftAuthService();
     private final BackendRuntime backendRuntime = new BackendRuntime();
     private final UpdateService updates = new UpdateService();
@@ -189,8 +192,45 @@ public final class LauncherApp extends JFrame {
                         || restored.backup() == null || !Files.exists(restored.backup().resolve("options.txt"))) {
                     throw new IllegalStateException("Falha na restauração segura da instância.");
                 }
+                Path supportInstance = temporary.resolve("support").resolve(".cobblemon_legacy");
+                Path supportHome = temporary.resolve("support-launcher");
+                Files.createDirectories(supportInstance.resolve("logs"));
+                Files.createDirectories(supportInstance.resolve("crash-reports"));
+                Files.createDirectories(supportInstance.resolve("mods"));
+                Files.writeString(supportInstance.resolve("logs").resolve("latest.log"),
+                        "erro de teste", StandardCharsets.UTF_8);
+                Files.writeString(supportInstance.resolve("crash-reports").resolve("crash-test.txt"),
+                        "crash de teste", StandardCharsets.UTF_8);
+                Files.writeString(supportInstance.resolve("mods").resolve("mod-teste.jar"),
+                        "mod", StandardCharsets.UTF_8);
+                Files.writeString(supportInstance.resolve(".launcher-performance-v1.json"),
+                        "{}", StandardCharsets.UTF_8);
+                LauncherLogService supportLog = new LauncherLogService(supportHome);
+                supportLog.log("error", "access_token=segredo erro do launcher");
+                Files.writeString(supportHome.resolve("microsoft-account.json"),
+                        "{\"accessToken\":\"nao-exportar\"}", StandardCharsets.UTF_8);
+                Path exports = temporary.resolve("exports");
+                Files.createDirectories(exports);
+                LogExportService.Result support = LogExportService.export(
+                        supportInstance, supportHome, exports, CURRENT_VERSION);
+                try (ZipFile archive = new ZipFile(support.archive().toFile())) {
+                    if (support.includedFiles() != 4
+                            || archive.getEntry("minecraft/logs/latest.log") == null
+                            || archive.getEntry("minecraft/crash-reports/crash-test.txt") == null
+                            || archive.getEntry("minecraft/estado/.launcher-performance-v1.json") == null
+                            || archive.getEntry("launcher/logs/launcher.log") == null
+                            || archive.getEntry("diagnostico-do-sistema.txt") == null
+                            || archive.getEntry("launcher/microsoft-account.json") != null) {
+                        throw new IllegalStateException("Falha ao montar o pacote seguro de logs.");
+                    }
+                    String exportedLauncherLog = new String(archive.getInputStream(
+                            archive.getEntry("launcher/logs/launcher.log")).readAllBytes(), StandardCharsets.UTF_8);
+                    if (exportedLauncherLog.contains("segredo")) {
+                        throw new IllegalStateException("O pacote de logs não ocultou um token.");
+                    }
+                }
                 InstanceRestoreService.deleteRecursively(temporary);
-                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, eventos, banner centralizado, restauração segura, pasta da instância, nickname local e cancelamento Microsoft.");
+                System.out.println("SELF-TEST OK: Java 17+, JSON, updater, options 3955, pt_br, eventos, banner centralizado, exportação de logs, restauração segura, pasta da instância, nickname local e cancelamento Microsoft.");
                 return;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -255,6 +295,8 @@ public final class LauncherApp extends JFrame {
         setContentPane(shell);
 
         microsoftAccount = microsoft.cachedAccount();
+        launcherLog.log("status", "Launcher " + CURRENT_VERSION + " iniciado em "
+                + System.getProperty("os.name", "sistema desconhecido") + ".");
         updateAuthUi();
         checkForUpdates();
     }
@@ -369,16 +411,19 @@ public final class LauncherApp extends JFrame {
         playButton.addActionListener(event -> startGame());
         content.add(playButton);
         content.add(Box.createVerticalStrut(10));
-        JPanel utilityButtons = transparentPanel(new GridLayout(1, 3, 7, 0));
+        JPanel utilityButtons = transparentPanel(new GridLayout(1, 4, 6, 0));
         utilityButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
         utilityButtons.setPreferredSize(new Dimension(360, 40));
         utilityButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         openDirectoryButton.setToolTipText("Abrir a pasta onde ficam mods, configurações e arquivos do Minecraft");
         openDirectoryButton.addActionListener(event -> openInstanceDirectory());
+        saveLogsButton.setToolTipText("Salvar logs e relatórios em um ZIP para enviar à administração");
+        saveLogsButton.addActionListener(event -> saveLogs());
         restoreButton.setToolTipText("Reparar o Minecraft sem apagar mundos, screenshots ou servidores");
         restoreButton.addActionListener(event -> restoreInstance());
         uninstallButton.addActionListener(event -> uninstall());
         utilityButtons.add(openDirectoryButton);
+        utilityButtons.add(saveLogsButton);
         utilityButtons.add(restoreButton);
         utilityButtons.add(uninstallButton);
         content.add(utilityButtons);
@@ -390,7 +435,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.30", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.31", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -776,6 +821,10 @@ public final class LauncherApp extends JFrame {
         return InstanceDirectoryService.path(Path.of(System.getProperty("user.home")));
     }
 
+    private static Path launcherHomePath() {
+        return Path.of(System.getProperty("user.home"), ".cobblemon_legacy_launcher");
+    }
+
     private void openInstanceDirectory() {
         if (busy) return;
         setBusy(true);
@@ -861,6 +910,49 @@ public final class LauncherApp extends JFrame {
         }.execute();
     }
 
+    private void saveLogs() {
+        if (busy) return;
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Escolha a pasta onde salvar o pacote de logs");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        Path home = Path.of(System.getProperty("user.home"));
+        Path desktop = home.resolve("Desktop");
+        if (!Files.isDirectory(desktop)) desktop = home.resolve("Área de Trabalho");
+        chooser.setCurrentDirectory((Files.isDirectory(desktop) ? desktop : home).toFile());
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            statusCard.update("status", "Exportação de logs cancelada.", 0);
+            return;
+        }
+
+        Path destination = chooser.getSelectedFile().toPath();
+        setBusy(true);
+        statusCard.update("working", "Reunindo logs e relatórios de erro...", 25);
+        new SwingWorker<LogExportService.Result, Void>() {
+            @Override protected LogExportService.Result doInBackground() throws Exception {
+                return LogExportService.export(instancePath(), launcherHomePath(), destination, CURRENT_VERSION);
+            }
+
+            @Override protected void done() {
+                try {
+                    LogExportService.Result result = get();
+                    launcherLog.log("success", "Pacote de suporte salvo: " + result.archive().getFileName());
+                    statusCard.update("success", "Logs salvos. Envie o arquivo ZIP para um administrador.", 100);
+                    JOptionPane.showMessageDialog(LauncherApp.this,
+                            "Pacote criado com " + result.includedFiles() + " arquivo(s):\n" + result.archive()
+                                    + "\n\nCredenciais Microsoft não foram incluídas. "
+                                    + "Os logs podem conter nickname, chat e endereços de servidores."
+                                    + (result.skipped().isEmpty() ? "" : "\n\nArquivos ignorados: " + result.skipped().size()),
+                            "Logs salvos", JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception error) {
+                    statusCard.update("error", "Não foi possível salvar os logs: " + rootMessage(error), 0);
+                } finally {
+                    setBusy(false);
+                }
+            }
+        }.execute();
+    }
+
     private void restoreInstance() {
         if (busy) return;
         Path home = Path.of(System.getProperty("user.home")).toAbsolutePath().normalize();
@@ -917,6 +1009,7 @@ public final class LauncherApp extends JFrame {
         weakPcMode.setEnabled(!value);
         playButton.setEnabled(!value);
         openDirectoryButton.setEnabled(!value);
+        saveLogsButton.setEnabled(!value);
         restoreButton.setEnabled(!value);
         uninstallButton.setEnabled(!value);
         playButton.setText(value ? "AGUARDE..." : "INICIAR AVENTURA");
@@ -1519,6 +1612,7 @@ public final class LauncherApp extends JFrame {
             setBorderPainted(false);
             setContentAreaFilled(false);
             setFocusPainted(false);
+            setMargin(new Insets(0, 2, 0, 2));
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             setPreferredSize(new Dimension(176, 40));
         }
@@ -1544,11 +1638,12 @@ public final class LauncherApp extends JFrame {
         ActionButton(String text, ButtonStyle style) {
             super(text);
             this.style = style;
-            setFont(font(style == ButtonStyle.PRIMARY ? 13 : 10, Font.BOLD));
+            setFont(font(style == ButtonStyle.PRIMARY ? 13 : 9, Font.BOLD));
             setForeground(style == ButtonStyle.PRIMARY ? Color.WHITE : style == ButtonStyle.DANGER ? RED : INK);
             setBorderPainted(false);
             setContentAreaFilled(false);
             setFocusPainted(false);
+            setMargin(new Insets(0, 2, 0, 2));
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             setPreferredSize(new Dimension(360, style == ButtonStyle.PRIMARY ? 54 : 40));
             setMaximumSize(new Dimension(Integer.MAX_VALUE, style == ButtonStyle.PRIMARY ? 54 : 40));
@@ -1592,12 +1687,14 @@ public final class LauncherApp extends JFrame {
     }
 
     private static final class StatusCard extends JPanel {
+        private final LauncherLogService launcherLog;
         private final JLabel title = label("STATUS DO LAUNCHER", INK, 10, Font.BOLD);
         private final JLabel state = label("PRONTO", GREEN, 9, Font.BOLD);
         private final JLabel message = label("Tudo certo para começar sua jornada.", MUTED, 10, Font.PLAIN);
         private final BrandProgressBar progress = new BrandProgressBar();
 
-        StatusCard() {
+        StatusCard(LauncherLogService launcherLog) {
+            this.launcherLog = launcherLog;
             setOpaque(false);
             setLayout(new BorderLayout(0, 8));
             setBorder(new EmptyBorder(14, 16, 14, 16));
@@ -1617,6 +1714,7 @@ public final class LauncherApp extends JFrame {
                 SwingUtilities.invokeLater(() -> update(type, text, value));
                 return;
             }
+            launcherLog.log(type, text);
             message.setText(text);
             message.setToolTipText(text);
             if (value >= 0) progress.setValue(value);
