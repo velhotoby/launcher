@@ -2,6 +2,7 @@ package com.cobblemonlegacy.v3;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -15,6 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -65,6 +68,7 @@ final class LogExportService {
                 total += size;
                 included += 1;
             }
+            included += collectWindowsDiagnostics(zip, skipped);
             String diagnostic = diagnosticReport(root, launcherVersion, included, skipped);
             zip.putNextEntry(new ZipEntry("diagnostico-do-sistema.txt"));
             zip.write(diagnostic.getBytes(StandardCharsets.UTF_8));
@@ -159,6 +163,64 @@ final class LogExportService {
         report.append("\nPrivacidade: credenciais e a sessão Microsoft não são incluídas neste pacote.\n")
                 .append("Logs do Minecraft podem conter nickname, mensagens de chat e endereços de servidores.\n");
         return report.toString();
+    }
+
+    private static int collectWindowsDiagnostics(ZipOutputStream zip, List<String> skipped) {
+        if (!System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win")) return 0;
+        int included = 0;
+        included += writeCommandDiagnostic(zip, skipped, "windows/code-integrity.txt", List.of(
+                windowsTool("wevtutil.exe"), "qe", "Microsoft-Windows-CodeIntegrity/Operational",
+                "/q:*[System[(Level=2 or Level=3)]]", "/c:200", "/rd:true", "/f:text"));
+        included += writeCommandDiagnostic(zip, skipped, "windows/applocker-msi-script.txt", List.of(
+                windowsTool("wevtutil.exe"), "qe", "Microsoft-Windows-AppLocker/MSI and Script",
+                "/q:*[System[(Level=2 or Level=3)]]", "/c:200", "/rd:true", "/f:text"));
+        included += writeCommandDiagnostic(zip, skipped, "windows/app-control-policies.json", List.of(
+                windowsTool("CiTool.exe"), "-lp", "-json"));
+        return included;
+    }
+
+    private static int writeCommandDiagnostic(ZipOutputStream zip, List<String> skipped,
+                                               String entry, List<String> command) {
+        Process process = null;
+        try {
+            process = new ProcessBuilder(command).redirectErrorStream(true).start();
+            Process running = process;
+            CompletableFuture<byte[]> output = CompletableFuture.supplyAsync(() -> {
+                try (InputStream input = running.getInputStream();
+                     ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                    input.transferTo(buffer);
+                    byte[] bytes = buffer.toByteArray();
+                    if (bytes.length <= 4 * 1024 * 1024) return bytes;
+                    return java.util.Arrays.copyOf(bytes, 4 * 1024 * 1024);
+                } catch (IOException error) {
+                    return ("Falha ao ler o diagnóstico: " + error.getMessage()).getBytes(StandardCharsets.UTF_8);
+                }
+            });
+            if (!process.waitFor(12, TimeUnit.SECONDS)) {
+                process.destroyForcibly();
+                skipped.add(entry + " (tempo limite do Windows excedido)");
+                return 0;
+            }
+            byte[] bytes = output.get(3, TimeUnit.SECONDS);
+            if (bytes.length == 0 && process.exitValue() != 0) {
+                skipped.add(entry + " (comando retornou " + process.exitValue() + ")");
+                return 0;
+            }
+            zip.putNextEntry(new ZipEntry(entry));
+            zip.write(bytes);
+            zip.closeEntry();
+            return 1;
+        } catch (Exception error) {
+            if (process != null) process.destroyForcibly();
+            skipped.add(entry + " (indisponível: " + error.getClass().getSimpleName() + ")");
+            return 0;
+        }
+    }
+
+    private static String windowsTool(String name) {
+        Path systemRoot = Path.of(System.getenv().getOrDefault("SystemRoot", "C:\\Windows"));
+        Path tool = systemRoot.resolve("System32").resolve(name);
+        return Files.isRegularFile(tool) ? tool.toString() : name;
     }
 
     private LogExportService() {}

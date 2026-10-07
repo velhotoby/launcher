@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
 public final class LauncherApp extends JFrame {
-    private static final String CURRENT_VERSION = "3.4.31";
+    private static final String CURRENT_VERSION = "3.4.32";
     private static final Color INK = new Color(27, 40, 61);
     private static final Color MUTED = new Color(82, 103, 116);
     private static final Color GREEN = new Color(34, 166, 109);
@@ -214,7 +214,7 @@ public final class LauncherApp extends JFrame {
                 LogExportService.Result support = LogExportService.export(
                         supportInstance, supportHome, exports, CURRENT_VERSION);
                 try (ZipFile archive = new ZipFile(support.archive().toFile())) {
-                    if (support.includedFiles() != 4
+                    if (support.includedFiles() < 4
                             || archive.getEntry("minecraft/logs/latest.log") == null
                             || archive.getEntry("minecraft/crash-reports/crash-test.txt") == null
                             || archive.getEntry("minecraft/estado/.launcher-performance-v1.json") == null
@@ -435,7 +435,7 @@ public final class LauncherApp extends JFrame {
 
         JPanel footer = transparentPanel(new BorderLayout());
         footer.add(label("AUTO-SYNC · PT-BR · DESEMPENHO AUTOMÁTICO", MUTED, 9, Font.BOLD), BorderLayout.WEST);
-        footer.add(label("VERSÃO 3.4.31", MUTED, 9, Font.BOLD), BorderLayout.EAST);
+        footer.add(label("VERSÃO 3.4.32", MUTED, 9, Font.BOLD), BorderLayout.EAST);
         content.add(footer);
 
         GridBagConstraints constraints = new GridBagConstraints();

@@ -53,10 +53,15 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           ASSET="dist/Cobblemon-Legacy-Launcher-${VERSION}.jar"
+          WINDOWS_ASSET="dist/Cobblemon-Legacy-Launcher-Windows.jar"
+          WINDOWS_SHA="${WINDOWS_ASSET}.sha256"
+          cp "$ASSET" "$WINDOWS_ASSET"
+          sha256sum "$WINDOWS_ASSET" | awk '{print $1}' > "$WINDOWS_SHA"
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+            gh release upload "$GITHUB_REF_NAME" "$ASSET" "$WINDOWS_ASSET" "$WINDOWS_SHA" --clobber
           else
-            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "Cobblemon Legacy Launcher ${VERSION}" --generate-notes
+            gh release create "$GITHUB_REF_NAME" "$ASSET" "$WINDOWS_ASSET" "$WINDOWS_SHA" \
+              --title "Cobblemon Legacy Launcher ${VERSION}" --generate-notes
           fi
 
       - name: Preservar links do site e manter duas versões rotativas

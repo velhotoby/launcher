@@ -1,0 +1,65 @@
+#pragma code_page(65001)
+
+#define IDD_INSTALLER 101
+#define IDI_APP 1
+#define IDR_RUNTIME 201
+#define IDR_BOOTSTRAP 202
+#define IDR_ICON_FILE 203
+#define IDR_FALLBACK_JAR 204
+
+#define IDC_STATUS 1001
+#define IDC_PROGRESS 1002
+#define IDC_INSTALL 1003
+#define IDC_CANCEL 1004
+
+IDI_APP ICON "../assets/cobblemon-legacy.ico"
+IDR_RUNTIME RCDATA "../payload/runtime-bundle.zip"
+IDR_BOOTSTRAP RCDATA "../payload/Cobblemon-Legacy-Bootstrap.jar"
+IDR_ICON_FILE RCDATA "../assets/cobblemon-legacy.ico"
+IDR_FALLBACK_JAR RCDATA "../payload/Cobblemon-Legacy-Launcher-Windows.jar"
+
+IDD_INSTALLER DIALOGEX 0, 0, 370, 220
+STYLE 0x80C80CC0
+CAPTION "Cobblemon Legacy Launcher"
+FONT 9, "Segoe UI"
+BEGIN
+    ICON IDI_APP, -1, 18, 16, 32, 32
+    LTEXT "COBBLEMON LEGACY LAUNCHER", -1, 60, 16, 270, 13, 0x00000000
+    LTEXT "Instalacao segura para Windows", -1, 60, 32, 270, 12, 0x00000000
+    CONTROL "", -1, "STATIC", 0x50000010, 16, 59, 338, 1
+    LTEXT "Este instalador trabalha somente dentro da pasta do usuario e nao executa partes do launcher no diretorio temporario do Windows.", -1, 18, 73, 334, 34, 0x00000000
+    LTEXT "Clique em Instalar para baixar a versao mais recente, instalar o Java 21 e criar os atalhos.", -1, 18, 111, 334, 27, 0x00000000
+    LTEXT "Pronto para instalar.", IDC_STATUS, 18, 145, 334, 14, 0x00000000
+    CONTROL "", IDC_PROGRESS, "msctls_progress32", 0x50000008, 18, 163, 334, 11
+    DEFPUSHBUTTON "Instalar", IDC_INSTALL, 191, 189, 78, 23
+    PUSHBUTTON "Cancelar", IDC_CANCEL, 276, 189, 78, 23
+END
+
+1 VERSIONINFO
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "041604B0"
+    BEGIN
+      VALUE "CompanyName", "Comunidade Cobblemon Legacy\0"
+      VALUE "FileDescription", "Instalador seguro do Cobblemon Legacy Launcher\0"
+      VALUE "FileVersion", "2.0.0.0\0"
+      VALUE "InternalName", "CobblemonLegacyInstaller\0"
+      VALUE "LegalCopyright", "Comunidade Cobblemon Legacy\0"
+      VALUE "OriginalFilename", "Cobblemon-Legacy-Launcher-Installer.exe\0"
+      VALUE "ProductName", "Cobblemon Legacy Launcher\0"
+      VALUE "ProductVersion", "Windows 2.0\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0416, 1200
+  END
+END

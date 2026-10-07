@@ -6,7 +6,9 @@ Launcher oficial multiplataforma da comunidade Cobblemon Legacy.
 
 No Windows, use o [Cobblemon-Legacy-Launcher-Installer.exe](https://github.com/velhotoby/launcher/releases/download/v3.4.21/Cobblemon-Legacy-Launcher-Installer.exe):
 ele baixa e valida automaticamente o JAR estável mais recente, instala o Java 21 e cria
-atalhos na Área de Trabalho, menu Iniciar e barra de tarefas.
+atalhos na Área de Trabalho, menu Iniciar e barra de tarefas. O instalador Windows 2.0 funciona
+em estágio único e não executa componentes próprios dentro de `%TEMP%`, evitando o fluxo que
+provocava o erro 4551 do Controle de Aplicativos.
 
 Também é possível baixar o JAR mais recente na página de [Releases](../../releases/latest).
 O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado automaticamente.
@@ -17,6 +19,7 @@ O JAR exige Java 17 ou superior; o Java 21 usado pelo Minecraft é gerenciado au
 - login local e conta original Microsoft/Minecraft
 - sincronização e reparo automático do modpack por fontes confiáveis
 - diagnóstico salvo quando falha a entrada no servidor; mods novos só são descobertos após erro de mod verificável
+- exportação dos logs e diagnósticos do Windows em um ZIP escolhido pelo jogador
 - idioma Português (Brasil) e atalhos padronizados
 - três endereços do servidor configurados automaticamente
 - atualização do próprio launcher pela publicação mais recente do GitHub

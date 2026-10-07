@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.30`
-- Tag estável: `v3.4.30`
-- Versão local em teste: `3.4.31`
+- Versão estável publicada: `3.4.31`
+- Tag estável: `v3.4.31`
+- Versão local em teste: `3.4.32`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
-- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.31.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.30`
+- JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.32.jar`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.31`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -40,7 +40,7 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
 - Idioma forçado para Português (Brasil), preservando as demais opções do jogo
 - Atalhos de teclado normalizados para um conjunto padrão para novos jogadores
 
-## Exportação de logs para suporte — versão 3.4.31 local
+## Exportação de logs para suporte — versão 3.4.31 publicada
 
 - A imagem recebida mostra o erro `4551` do instalador no Windows: uma política de Controle de
   Aplicativos bloqueou a execução de um arquivo extraído no diretório temporário. Esse bloqueio
@@ -64,8 +64,50 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
   aprovados
 - JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.31.jar`
 - SHA-256 local: `e8598c53f4f577bd705bccbff7e8ac9c0ad7c36e8f62ddc5a8c171afb692f3b0`
-- O layout foi conferido visualmente no Linux; a versão `3.4.31` ainda não foi publicada no
-  GitHub nem testada visualmente no Windows
+- O layout foi conferido visualmente no Linux; a versão `3.4.31` foi publicada pelo workflow
+  `37677918408`, cujo build, autotestes e retenção foram concluídos com sucesso
+- O JAR público foi baixado novamente e aprovado no autoteste; SHA-256 público:
+  `553c6386230f4b59632acaf62e5eafc42470d1d0ff274b769787a92b30cafd0e`
+- Retenção após a publicação: versões rotativas `3.4.31` e `3.4.30`, além da permanente
+  `3.4.21`
+
+## Instalador Windows sem execução em TEMP — versão 3.4.32 local
+
+- O erro Windows `4551` foi relacionado ao `SetupLdr` do antigo instalador Inno Setup: ele
+  copiava e executava uma segunda parte do instalador dentro de `%TEMP%`, comportamento que uma
+  política de Controle de Aplicativos pode bloquear antes de o launcher ser instalado
+- O instalador Windows `2.0` foi refeito como um único executável nativo x64, sem `SetupLdr` e sem
+  executar componentes próprios no diretório temporário. Ele instala somente para o usuário em
+  `%LOCALAPPDATA%\Programs\Cobblemon Legacy Launcher`, sem exigir administrador
+- O runtime Java 21 e uma cópia de contingência do JAR ficam incorporados. A instalação tenta
+  baixar `Cobblemon-Legacy-Launcher-Windows.jar` da release mais recente, confere o SHA-256
+  publicado e usa a cópia incorporada somente quando GitHub/checksum não estão disponíveis
+- Os atalhos executam diretamente o `javaw.exe` do runtime oficial com um bootstrap Java; não há
+  novo executável próprio intermediário. O bootstrap escolhe semanticamente o JAR versionado mais
+  novo depois das atualizações automáticas
+- O workflow passa a publicar em toda release o JAR versionado, o alias fixo de Windows e seu
+  arquivo SHA-256, mantendo o instalador permanente capaz de obter versões futuras
+- O instalador registra sua atividade em
+  `%USERPROFILE%\.cobblemon_legacy_launcher\logs\windows-installer.log`. O botão `SALVAR LOGS`
+  também tenta incluir até 200 eventos recentes de Code Integrity e AppLocker e o inventário de
+  políticas do App Control por `CiTool`, sem falhar quando um recurso não existe
+- Teste Wine isolado: instalação por usuário, cópia de contingência, runtime Java 21, bootstrap,
+  JAR, log e atalhos de menu Iniciar/barra de tarefas aprovados. O Wine não possui o `tar.exe` do
+  Windows, portanto o comando foi simulado; o ZIP real incorporado foi validado integralmente com
+  315 arquivos e o runtime Windows executou os autotestes do bootstrap e do launcher
+- Autotestes do launcher, backend, desempenho, diagnóstico, reparo, minimapa, resource packs,
+  catálogo crítico, descoberta, PE x64, recursos incorporados e integridade do instalador:
+  aprovados
+- JAR local: `dist/Cobblemon-Legacy-Launcher-3.4.32.jar`
+- SHA-256 local do JAR:
+  `87403f2405c515ca5174f88b6f1fe94e9a8c4200e545412f6f0f35d67fb5cb44`
+- Instalador local: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
+- SHA-256 local do instalador:
+  `9acf1a829ebac7f5628d0e5744de1f34d90f6de6d683a24f7de1b66b4b66b0e6`
+- O executável ainda não possui assinatura Authenticode. A remoção do subprocesso em `%TEMP%`
+  trata o erro observado, mas uma política empresarial que proíba todo software sem assinatura
+  ainda exigirá certificado confiável ou liberação explícita pelo administrador
+- A versão `3.4.32` e o novo instalador ainda não foram publicados
 
 ## Diagnóstico de crash e restauração — versão 3.4.30 publicada
 
