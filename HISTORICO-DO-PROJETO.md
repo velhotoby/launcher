@@ -10,12 +10,12 @@ mudança relevante for concluída, testada ou publicada.
 
 - Repositório oficial: `https://github.com/velhotoby/launcher`
 - Branch principal: `main`
-- Versão estável publicada: `3.4.31`
-- Tag estável: `v3.4.31`
+- Versão estável publicada: `3.4.32`
+- Tag estável: `v3.4.32`
 - Versão local em teste: `3.4.32`
 - Classe principal: `com.cobblemonlegacy.v3.LauncherApp`
 - JAR local em teste: `dist/Cobblemon-Legacy-Launcher-3.4.32.jar`
-- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.31`
+- Release: `https://github.com/velhotoby/launcher/releases/tag/v3.4.32`
 - Instalador Windows: `windows-installer/dist/Cobblemon-Legacy-Launcher-Installer.exe`
 - Política de retenção pública: a release/tag `v3.4.21` é permanente porque seus links estão no
   site; além dela, manter somente as duas releases/tags rotativas mais recentes. A proteção e a
@@ -71,7 +71,7 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
 - Retenção após a publicação: versões rotativas `3.4.31` e `3.4.30`, além da permanente
   `3.4.21`
 
-## Instalador Windows sem execução em TEMP — versão 3.4.32 local
+## Instalador Windows sem execução em TEMP — versão 3.4.32 publicada
 
 - O erro Windows `4551` foi relacionado ao `SetupLdr` do antigo instalador Inno Setup: ele
   copiava e executava uma segunda parte do instalador dentro de `%TEMP%`, comportamento que uma
@@ -107,7 +107,20 @@ automaticamente as releases rotativas que ultrapassarem o limite de duas.
 - O executável ainda não possui assinatura Authenticode. A remoção do subprocesso em `%TEMP%`
   trata o erro observado, mas uma política empresarial que proíba todo software sem assinatura
   ainda exigirá certificado confiável ou liberação explícita pelo administrador
-- A versão `3.4.32` e o novo instalador ainda não foram publicados
+- A versão `3.4.32` foi publicada pelo workflow `37680979083`; build, todos os autotestes,
+  criação da release, aliases Windows e retenção foram concluídos com sucesso
+- O JAR público versionado e o alias Windows são idênticos e foram novamente aprovados no
+  autoteste e `--backend-probe`; SHA-256 público:
+  `3668a608b636e53e28a19ce8916a6068eb50284839b0c9183034a84839548dda`
+- O instalador público da `v3.4.32` e o asset permanente da `v3.4.21` são idênticos ao build
+  local; SHA-256 público:
+  `9acf1a829ebac7f5628d0e5744de1f34d90f6de6d683a24f7de1b66b4b66b0e6`
+- Os links diretos `releases/latest/download/Cobblemon-Legacy-Launcher-Windows.jar` e `.sha256`
+  foram baixados e o hash conferido. O URLMon do Wine não completou o HTTPS do GitHub e acionou
+  corretamente a cópia incorporada; isso é uma limitação conhecida do ambiente de simulação, não
+  do link público validado
+- Retenção após a publicação: versões rotativas `3.4.32` e `3.4.31`, além da permanente
+  `3.4.21`; a rotativa `3.4.30` foi removida automaticamente
 
 ## Diagnóstico de crash e restauração — versão 3.4.30 publicada
 
